@@ -2,9 +2,19 @@ require('dotenv').config();
 const { Client, IntentsBitField } = require('discord.js');
 const { CommandHandler } = require('djs-commander');
 const path = require('path');
-const { TOKEN } = process.env;
+const mongoose = require('mongoose');
 
-const client = new Client({ intents: [ IntentsBitField.Flags.Guilds ] });
+const { TOKEN, MONGODB_URI } = process.env;
+
+const client = new Client({
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildPresences, // to get status of users
+    IntentsBitField.Flags.MessageContent
+  ]
+});
 
 new CommandHandler({
   client,
@@ -13,5 +23,16 @@ new CommandHandler({
   validationsPath: path.join(__dirname, 'validations'),
   // testServer: '1148950990452686900',
 });
+
+(async () => {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log("Connected to DB.");
+
+  } catch (error) {
+    console.log(`Error: ${error}`);
+  }
+
+})();
 
 client.login(TOKEN);
