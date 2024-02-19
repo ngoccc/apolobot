@@ -2,21 +2,21 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-          .setName('apoloban')
-          .setDescription("Ban with Apology option.")
-          .addUserOption(option =>
-            option
-              .setName('target-user')
-              .setDescription('The user to ban with apology option.')
-              .setRequired(true)
-          )
-          .addStringOption(option =>
-            option
-              .setName('reason')
-              .setDescription('The reason for banning.')
-          )
-          .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
-          .setDMPermission(false),
+    .setName('apoloban')
+    .setDescription("Ban with Apology option.")
+    .addUserOption(option =>
+      option
+        .setName('target-user')
+        .setDescription('The user to ban with apology option.')
+        .setRequired(true)
+    )
+    .addStringOption(option =>
+      option
+        .setName('reason')
+        .setDescription('The reason for banning.')
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
   run: async ({ interaction }) => {
     // Get the user to ban
 		const user = interaction.options.getUser('target-user');

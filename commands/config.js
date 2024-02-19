@@ -36,7 +36,7 @@ module.exports = {
       // Save channel ID to database
       let guild = await Guild.findOne({ guildId: targetGuild.id });
 
-      if (guild) { guild.alertChannelId = targetChannel; }
+      if (guild) { guild.alertChannelId = targetChannel.id; }
       else {
         guild = new Guild({
           guildId: targetGuild.id,

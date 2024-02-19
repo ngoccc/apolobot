@@ -5,6 +5,10 @@ const guildSchema = new Schema({
     type: String,
     required: true,
   },
+  totalCase: {
+    type: Number,
+    default: 0,
+  },
   alertChannelId: {
     type: String,
     required: true,

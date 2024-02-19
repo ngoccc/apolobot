@@ -1,15 +1,19 @@
 const { Schema, model } = require('mongoose');
 
 const caseSchema = new Schema({
-  caseId: {
-    type: String,
-    required: true,
-  },
   guildId: {
     type: String,
     required: true,
   },
+  localCaseId: {
+    type: Number,
+    required: true,
+  },
   modId: {
+    type: String,
+    required: true,
+  },
+  duration: {
     type: String,
     required: true,
   },
@@ -38,7 +42,12 @@ const caseSchema = new Schema({
   },
   approvalStatus: {
     type: String,
-    required: true,
+  },
+  victimThread: {
+    type: String,
+  },
+  offenderThread: {
+    type: String,
   },
   victimRequest: {
     type: String,
