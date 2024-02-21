@@ -43,10 +43,10 @@ const caseSchema = new Schema({
   approvalStatus: {
     type: String,
   },
-  victimThread: {
+  victimThreadId: {
     type: String,
   },
-  offenderThread: {
+  offenderThreadId: {
     type: String,
   },
   victimRequest: {

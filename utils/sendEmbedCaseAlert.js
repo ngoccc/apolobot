@@ -13,15 +13,16 @@ module.exports = (channel, _case) => {
     victimId,
     offenderId,
     processStep,
-    victimRequest
+    victimRequest,
+    offenderResponse,
+    approvalStatus,
   } = _case;
 
-  console.log(require('discord.js').version);
   let caseAlertEmbed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle(`Case ${localCaseId}`)
     .setURL('https://discord.js.org/')
-    .setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
+    //.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
     .setDescription('A new update was received from the case!')
     .addFields(
       { name: 'Victim', value: `<@${victimId}>`, inline: true },
@@ -31,6 +32,12 @@ module.exports = (channel, _case) => {
 
   if (processStep === 'Victim Requested') {
     caseAlertEmbed.addFields({ name: 'Victim Request', value: `${victimRequest}` });
+  } else if (processStep === 'Offender Responded') {
+    caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
+  }
+
+  if (approvalStatus && approvalStatus === 'Case Closed - Failed to Apologize') {
+    caseAlertEmbed.addFields({ name: 'Approval Status', value: `${approvalStatus}` });
   }
 
   if (channel && channel.isTextBased()) {

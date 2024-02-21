@@ -140,9 +140,8 @@ module.exports = {
     let offenderThread;
     try {
       offenderThread = await interaction.channel.threads.create({
-        name: `case-offender-${offender.user.username}-${victim.user.username}`,
+        name: `case-offender-${offender.displayName}-${victim.displayName}`,
         type: ChannelType.PrivateThread,
-        // autoArchiveDuration: msDuration,
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
       });
@@ -155,8 +154,8 @@ module.exports = {
     await offenderThread.members.add(offender);
 
     // Send a message to the offender in the private thread
-    offenderThread.send(`You have been muted in all channels except this private thread. Please wait for further instructions.`);
-    _case.offenderThread = offenderThread.id;
+    offenderThread.send(`You have been muted in all channels except this private thread.\nReason: ${reason}\nThis decision will be further reviewed by the moderation team and involving community member(s).`);
+    _case.offenderThreadId = offenderThread.id;
     await _case.save();
 
     // TODO: add reason and other info here.
@@ -169,7 +168,6 @@ module.exports = {
       victimThread = await interaction.channel.threads.create({
         name: `case-victim-${offender.user.username}-${victim.user.username}`,
         type: ChannelType.PrivateThread,
-        // autoArchiveDuration: msDuration,
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
       });
@@ -182,7 +180,7 @@ module.exports = {
     await victimThread.members.add(victim);
 
     _case.processStep = 'Waiting for Victim Request';
-    _case.victimThread = victimThread.id;
+    _case.victimThreadId = victimThread.id;
     await _case.save();
 
     // Send initial prompt
@@ -190,7 +188,7 @@ module.exports = {
                     .setCustomId(`yes-${_case.id}`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Success);
-     const no = new ButtonBuilder()
+    const no = new ButtonBuilder()
                     .setCustomId(`no-${_case.id}`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Danger);
