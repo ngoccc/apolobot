@@ -12,6 +12,7 @@ const {
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const sendEmbedCaseAlert = require('../utils/sendEmbedCaseAlert');
+const sendApproveForm = require('../utils/sendApproveForm');
 
 const ms = require('ms');
 
@@ -183,78 +184,16 @@ module.exports = {
     _case.victimThreadId = victimThread.id;
     await _case.save();
 
-    // Send initial prompt
-    const yes = new ButtonBuilder()
-                    .setCustomId(`yes-${_case.id}`)
-                    .setLabel('Yes')
-                    .setStyle(ButtonStyle.Success);
-    const no = new ButtonBuilder()
-                    .setCustomId(`no-${_case.id}`)
-                    .setLabel('No')
-                    .setStyle(ButtonStyle.Danger);
-    const row = new ActionRowBuilder()
-                    .addComponents(yes, no);
-
-    const promptMessage = await victimThread.send({
-      content: `${victim}, ${mod} has observed inappropriate behavior from ${offender.name}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
-      components: [row],
-    });
-
-    // Set up button collector
-    const filter = (interaction) => interaction.user.id === victim.id;
-    const collector = victimThread.createMessageComponentCollector({ filter });
-
-    collector.on('collect', async (interaction) => {
-      const response = interaction.customId;
-      if (response.includes('yes')) {
-        // Send apology form
-        // Create the modal
-        const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
-        const modal = new ModalBuilder()
-          .setCustomId(`apologyRequest-${extractedId}`)
-          .setTitle('Apology Request');
-
-        // Add components to modal
-        // Create the text input components
-        const apologyInput = new TextInputBuilder()
-          .setCustomId('apologyInput')
-            // The label is the prompt the user sees for this input
-          .setLabel("Enter your request here.")
-            // Short means only a single line of text
-          .setStyle(TextInputStyle.Paragraph)
-         // .setMaxLength(1000)
-         // .setMinLength(10) // TODO: specify these number
-          .setRequired(true);
-
-        // An action row only holds one text input,
-        // so you need one action row per text input.
-        const apologyActionRow = new ActionRowBuilder().addComponents(apologyInput);
-
-        // Add inputs to the modal
-        modal.addComponents(apologyActionRow);
-
-        // Show the modal to the user
-        await interaction.showModal(modal);
-
-      } else if (response.includes('no')) {
-        // Send a thank you message
-        // TODO: remarks?
-        const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
-        let _case = await Case.findOne({ _id: extractedId });
-        _case.processStep = 'Case Closed - Failed to Apologize';
-        _case.approvalStatus = 'Victim Declined';
-        await _case.save();
-
-        await interaction.reply('Thank you for your response.', { ephemeral: true });
-      }
-    });
-
-    collector.on('end', (collected, reason) => {
-      if (reason === 'time') {
-        // Handle if the user took too long to respond
-        victimThread.send('You took too long to respond. The thread is now closed.');
-        victimThread.delete();
-      }
+    // Send form to victim
+    sendApproveForm({
+      type: 'yn',
+      msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
+      thread: victimThread,
+      interaction: interaction,
+      target: victim,
+      _case: _case,
+      customId: "apologyRequest",
+      role: "victim",
     });
   },
 

@@ -1,5 +1,6 @@
 const { EmbedBuilder, BaseChannel } = require('discord.js');
 const Case = require('../models/Case');
+const handleOffenderRequest = require('./handleOffenderRequest');
 
 module.exports = (channel, _case) => {
   /**
@@ -32,15 +33,15 @@ module.exports = (channel, _case) => {
 
   if (processStep === 'Victim Requested') {
     caseAlertEmbed.addFields({ name: 'Victim Request', value: `${victimRequest}` });
-  } else if (processStep === 'Offender Responded') {
-    caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
   }
-
   if (approvalStatus && approvalStatus === 'Case Closed - Failed to Apologize') {
     caseAlertEmbed.addFields({ name: 'Approval Status', value: `${approvalStatus}` });
   }
 
-  if (channel && channel.isTextBased()) {
+  if (processStep === 'Offender Responded') {
+    caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
+    handleOffenderRequest(channel, _case, caseAlertEmbed);
+  } else {
     channel.send({ embeds: [caseAlertEmbed] });
   };
 };
