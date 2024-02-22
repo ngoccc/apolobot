@@ -189,7 +189,6 @@ module.exports = {
       type: 'yn',
       msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
       thread: victimThread,
-      interaction: interaction,
       target: victim,
       _case: _case,
       customId: "apologyRequest",
