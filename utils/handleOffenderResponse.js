@@ -2,11 +2,12 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ModalBuilder,
 } = require('discord.js');
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const handleVictimFinalReview = require('./handleVictimFinalReview');
-const sendEmbedCaseAlert = require('./sendEmbedCaseAlert');
+const sendRemarksForm = require('./sendRemarksForm');
 
 module.exports = (channel, _case, caseAlertEmbed) => {
   const approve = new ButtonBuilder()
@@ -25,7 +26,7 @@ module.exports = (channel, _case, caseAlertEmbed) => {
     components: [row],
   });
 
-  // send response to victim
+  // send response to mod
   const filter = (interaction) => interaction.user.id === _case.modId;
   const collector = channel.createMessageComponentCollector({ filter });
 
@@ -55,20 +56,16 @@ module.exports = (channel, _case, caseAlertEmbed) => {
       );
 
       await interaction.reply('Apology response sent to victim!.', { ephemeral: true });
+      return 1;
     } else if (response.includes('decline')) {
-      // Send a thank you message
-      // TODO: remarks?
+
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
-      let _case = await Case.findOne({ _id: extractedId });
+      sendRemarksForm(interaction, extractedId);
+
       _case.processStep = 'Case Closed - Failed to Apologize';
       _case.approvalStatus = 'Moderator Declined';
       await _case.save();
-
-      const guild = await Guild.findOne({ guildId: interaction.guild.id });
-      const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
-      sendEmbedCaseAlert(alertChannel, _case);
-
-      await interaction.reply('Thank you for your response.', { ephemeral: true });
+      return 0;
    }
   });
 };

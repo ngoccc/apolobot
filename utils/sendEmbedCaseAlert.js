@@ -1,6 +1,11 @@
-const { EmbedBuilder, BaseChannel } = require('discord.js');
+const {
+  EmbedBuilder,
+  ButtonStyle,
+  BaseChannel,
+} = require('discord.js');
 const Case = require('../models/Case');
-const handleOffenderRequest = require('./handleOffenderRequest');
+const handleOffenderResponse = require('./handleOffenderResponse');
+const sendRemarksForm = require('./sendRemarksForm');
 
 module.exports = (channel, _case) => {
   const {
@@ -12,6 +17,7 @@ module.exports = (channel, _case) => {
     victimRequest,
     offenderResponse,
     approvalStatus,
+    remarks,
   } = _case;
 
   let caseAlertEmbed = new EmbedBuilder()
@@ -25,19 +31,74 @@ module.exports = (channel, _case) => {
       { name: 'Mod', value: `<@${modId}>`, inline: true },
       { name: 'Process', value: `${processStep}` })
 
+  if (remarks) {
+    caseAlertEmbed.addFields({ name: 'Remarks', value: `${remarks}` });
+  }
+
   if (processStep === 'Victim Requested') {
     caseAlertEmbed.addFields({ name: 'Victim Request', value: `${victimRequest}` });
   }
-  if (approvalStatus && approvalStatus === 'Case Closed - Failed to Apologize') {
+  if (approvalStatus && processStep === 'Case Closed - Failed to Apologize') {
     caseAlertEmbed.addFields({ name: 'Approval Status', value: `${approvalStatus}` });
   }
 
   if (processStep === 'Offender Responded') {
     caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
-    handleOffenderRequest(channel, _case, caseAlertEmbed);
-  // } else if (processStep === 'Final Approved') {
-  //   // handleFinalApprove(channel, _case, caseAlertEmbed);
-  //   console.log('test-final step!');
+    const modApprove = handleOffenderResponse(channel, _case, caseAlertEmbed); // This func returns 1 if offender response was mod-approved, otherwise 0
+    if (modApprove) {
+      // TODO: send embed saying that mod approve
+    } else {
+      // decline = remarks = let the event handler do the rest?
+    }
+  } else if (processStep === 'Final Approved') {
+    const unmute = new ButtonBuilder()
+                    .setCustomId(`unmute-${_case.id}`)
+                    .setLabel('Unmute Offender')
+                    .setStyle(ButtonStyle.Primary);
+    const row = new ActionRowBuilder()
+                    .addComponents(unmute);
+
+    channel.send({
+      embeds: [caseAlertEmbed],
+      components: [row],
+    });
+    const filter = (interaction) => interaction.user.id === modId;
+    const collector = channel.createMessageComponentCollector({ filter });
+
+    collector.on('collect', async (interaction) => {
+      const response = interaction.customId;
+      const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
+      let _case = await Case.findOne({ _id: extractedId });
+      const offender = await interaction.guild.members.fetch(_case.offenderId);
+
+      if (response.includes('unmute')) {
+        try {
+          interaction.guild.channels.cache
+            .filter(
+              (channel) =>
+                ![
+                  'GUILD_DIRECTORY',
+                  'GUILD_NEWS_THREAD',
+                  'GUILD_PRIVATE_THREAD',
+                  'GUILD_PUBLIC_THREAD',
+                ].includes(channel.type),
+            )
+            .forEach(async (channel) => {
+              if (channel.type === 0 || channel.type === 2) {
+                await channel.permissionOverwrites.edit(offender.id, { SendMessages: true });
+              }
+            });
+        } catch (error) {
+          console.log(`Error: ${error}`);
+          return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
+        }
+        _case.approvalStatus = "All Approved";
+        _case.processStep = "Case Closed - Succeeded to Apologize";
+        await _case.save();
+        interaction.reply({ content: 'Successfully unmuted offender!', ephemeral: true });
+        sendRemarksForm(interaction, extractedId);
+      } else return;
+    });
   } else {
     channel.send({ embeds: [caseAlertEmbed] });
   };

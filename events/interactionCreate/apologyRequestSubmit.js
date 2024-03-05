@@ -60,6 +60,17 @@ module.exports = async (interaction) => {
 
       await interaction.reply({ content: 'Your apology response was received successfully!' });
     }
+    else if (interaction.customId.includes('remarks')) {
+      const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
+      let _case = await Case.findOne({ _id: extractedId });
+      _case.remarks = interaction.fields.getTextInputValue('remarks');
+      await interaction.reply({ content: 'Your response were received successfully. Your perspective are valuable to improve the community!' });
+
+      // remarks is always in the end so send embed update here
+      const guild = await Guild.findOne({ guildId: interaction.guild.id });
+      const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
+      sendEmbedCaseAlert(alertChannel, _case);
+    }
   }
   else return;
 };

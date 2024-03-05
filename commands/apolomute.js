@@ -62,7 +62,7 @@ module.exports = {
     const reason = interaction.options.getString('reason');
     const proof = interaction.options.getAttachment('proof');
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     // TODO: Check conditions of user
     // 1. user (offender/victim) doesn't exist in server
@@ -160,7 +160,7 @@ module.exports = {
     await _case.save();
 
     // TODO: add reason and other info here.
-    interaction.editReply({ content: `${offender} has been muted from the server`, ephemeral: true });
+    interaction.editReply({ content: `${offender} has been muted from the server` });
 
     // Send a private thread to victim
     // Create a private thread
@@ -174,7 +174,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(`Error: ${error}`);
-			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for victim', ephemeral: true });
+			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for victim' });
     }
 
     // Add the victim to the thread
@@ -194,6 +194,31 @@ module.exports = {
       customId: "apologyRequest",
       role: "victim",
     });
+
+    // [testing] In the background, unmute the offender after the duration
+    console.log(`test-msDuration: ${msDuration}`);
+    setTimeout(() => {
+      try {
+        interaction.guild.channels.cache
+          .filter(
+            (channel) =>
+              ![
+                'GUILD_DIRECTORY',
+                'GUILD_NEWS_THREAD',
+                'GUILD_PRIVATE_THREAD',
+                'GUILD_PUBLIC_THREAD',
+              ].includes(channel.type),
+          )
+          .forEach(async (channel) => {
+            if (channel.type === 0 || channel.type === 2) {
+              await channel.permissionOverwrites.edit(offender.id, { SendMessages: true });
+            }
+          });
+      } catch (error) {
+        console.log(`Error: ${error}`);
+        return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
+      }
+    }, msDuration);
   },
 
   devOnly: true,

@@ -6,6 +6,7 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require('discord.js');
+const sendRemarksForm = require('../utils/sendRemarksForm');
 
 // sendApproveForm('yn', "the mod team has...", victimThread, interaction, victim, _case, apologyResponse);
 module.exports = async (args) => {
@@ -78,7 +79,7 @@ module.exports = async (args) => {
       _case.approvalStatus = `${role.toUpperCase()} Declined `;
       await _case.save();
 
-      await interaction.reply('Thank you for your response.', { ephemeral: true });
+      sendRemarksForm(interaction, extractedId);
     }
   });
 };
