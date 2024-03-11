@@ -167,7 +167,7 @@ module.exports = {
     let victimThread;
     try {
       victimThread = await interaction.channel.threads.create({
-        name: `case-victim-${offender.user.username}-${victim.user.username}`,
+        name: `case-victim-${offender.displayName}-${victim.displayName}`,
         type: ChannelType.PrivateThread,
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,

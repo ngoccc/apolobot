@@ -45,11 +45,12 @@ module.exports = {
     }
 
     if (_case.processStep.includes('Case Closed')) {
-      return interaction.reply({ content: `Case ${caseId} has been resolved`, ephemeral: true });
+      return interaction.reply({ content: `Case ${caseId} has already been resolved`, ephemeral: true });
     }
 
     // TODO: implement more later (alert n stuffs) - for now just rm it for testing
 
+    console.log('should be here!!');
     try {
       interaction.guild.channels.cache
         .filter(

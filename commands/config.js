@@ -29,14 +29,16 @@ module.exports = {
       const targetChannel = interaction.options.getChannel('alert-channel');
       const targetGuild = interaction.guild;
 
-      // [Testing] Log information
-      console.log(`Alert channel set to: ${targetChannel.name}`);
-      console.log(`Channel id: ${targetChannel.id}`)
-
       // Save channel ID to database
       let guild = await Guild.findOne({ guildId: targetGuild.id });
 
-      if (guild) { guild.alertChannelId = targetChannel.id; }
+      if (guild) {
+        if (guild.alertChannelId === targetChannel.id) {
+          return interaction.reply({ content: `Alert channel has already been set to ${targetChannel}.`});
+        } else {
+          guild.alertChannelId = targetChannel.id;
+        }
+      }
       else {
         guild = new Guild({
           guildId: targetGuild.id,
