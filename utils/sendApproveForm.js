@@ -6,7 +6,8 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require('discord.js');
-const sendRemarksForm = require('../utils/sendRemarksForm');
+const sendRemarksForm = require('./sendRemarksForm');
+const Case = require('../models/Case');
 
 // sendApproveForm('yn', "the mod team has...", victimThread, interaction, victim, _case, apologyResponse);
 module.exports = async (args) => {
@@ -41,6 +42,7 @@ module.exports = async (args) => {
 
   collector.on('collect', async (interaction) => {
     const response = interaction.customId;
+
     if (response.includes('yes')) {
       // Create the modal
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
@@ -72,7 +74,6 @@ module.exports = async (args) => {
 
     } else if (response.includes('no')) {
       // Send a thank you message
-      // TODO: remarks?
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
       let _case = await Case.findOne({ _id: extractedId });
       _case.processStep = 'Case Closed - Failed to Apologize';

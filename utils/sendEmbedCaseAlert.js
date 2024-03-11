@@ -1,11 +1,14 @@
 const {
   EmbedBuilder,
   ButtonStyle,
+  ButtonBuilder,
+  ActionRowBuilder,
   BaseChannel,
 } = require('discord.js');
 const Case = require('../models/Case');
 const handleOffenderResponse = require('./handleOffenderResponse');
 const sendRemarksForm = require('./sendRemarksForm');
+const notifyUsers = require('./notifyUsers');
 
 module.exports = (channel, _case) => {
   const {
@@ -16,6 +19,8 @@ module.exports = (channel, _case) => {
     processStep,
     victimRequest,
     offenderResponse,
+    victimThreadId,
+    offenderThreadId,
     approvalStatus,
     remarks,
   } = _case;
@@ -97,6 +102,10 @@ module.exports = (channel, _case) => {
         await _case.save();
         interaction.reply({ content: 'Successfully unmuted offender!', ephemeral: true });
         sendRemarksForm(interaction, extractedId);
+        // notify victim and offender
+        const victimThread = await interaction.client.channels.fetch(victimThreadId);
+        const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
+        notifyUsers(_case, [victimThread, offenderThread]);
       } else return;
     });
   } else {

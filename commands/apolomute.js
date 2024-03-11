@@ -196,7 +196,6 @@ module.exports = {
     });
 
     // [testing] In the background, unmute the offender after the duration
-    console.log(`test-msDuration: ${msDuration}`);
     setTimeout(() => {
       try {
         interaction.guild.channels.cache
