@@ -132,6 +132,8 @@ module.exports = {
             await channel.permissionOverwrites.create(offender.id, { SendMessages: false });
           }
         });
+
+      // Also mute the given thread
     } catch (error) {
       console.log(`Error: ${error}`);
 			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
@@ -159,8 +161,8 @@ module.exports = {
     _case.offenderThreadId = offenderThread.id;
     await _case.save();
 
-    // TODO: add reason and other info here.
-    interaction.editReply({ content: `${offender} has been muted from the server` });
+    // TODO: might add proof here if later implemented
+    interaction.editReply({ content: `${offender} has been muted from the server\nReason: ${reason}` });
 
     // Send a private thread to victim
     // Create a private thread
@@ -192,7 +194,7 @@ module.exports = {
       target: victim,
       _case: _case,
       customId: "apologyRequest",
-      role: "victim",
+      role: "Victim",
     });
 
     // [testing] In the background, unmute the offender after the duration

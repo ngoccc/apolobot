@@ -6,8 +6,8 @@ const {
 } = require('discord.js');
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
-const sendEmbedCaseAlert = require('../utils/sendEmbedCaseAlert');
-const sendRemarksForm = require('../utils/sendRemarksForm');
+const sendRemarksForm = require('./sendRemarksForm');
+const disableButton = require('../components/disableButton');
 
 module.exports = (victimThread, _case, msg) => {
   const approve = new ButtonBuilder()
@@ -40,6 +40,13 @@ module.exports = (victimThread, _case, msg) => {
       await _case.save();
 
       sendRemarksForm(interaction, extractedId);
+
+      // Disable the buttons
+      await interaction.message.edit({
+        components: [disableButton("Approved")],
+      });
+
+      return 1;
 
     } else if (response.includes('decline')) {
       // Send a thank you message

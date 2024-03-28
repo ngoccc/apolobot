@@ -7,6 +7,7 @@ const {
   TextInputStyle,
 } = require('discord.js');
 const sendRemarksForm = require('./sendRemarksForm');
+const notifyUsers = require('./notifyUsers');
 const Case = require('../models/Case');
 
 // sendApproveForm('yn', "the mod team has...", victimThread, interaction, victim, _case, apologyResponse);
@@ -77,10 +78,22 @@ module.exports = async (args) => {
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
       let _case = await Case.findOne({ _id: extractedId });
       _case.processStep = 'Case Closed - Failed to Apologize';
-      _case.approvalStatus = `${role.toUpperCase()} Declined `;
+      _case.approvalStatus = `${role} Declined `;
       await _case.save();
 
       sendRemarksForm(interaction, extractedId);
+      // notify victim and offender
+      const victimThread = await interaction.client.channels.fetch(_case.victimThreadId);
+      const offenderThread = await interaction.client.channels.fetch(_case.offenderThreadId);
+      notifyUsers(_case, [victimThread, offenderThread]);
+
+      // Disable the buttons
+      row.components[0].setDisabled(true);
+      row.components[1].setDisabled(true);
+      interaction.editReply({
+        content: `${msg}`,
+        components: [row],
+      });
     }
   });
 };

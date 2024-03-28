@@ -1,15 +1,8 @@
-const {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-} = require('discord.js');
 const Case = require('../../models/Case');
 const Guild = require('../../models/Guild');
 const sendEmbedCaseAlert = require('../../utils/sendEmbedCaseAlert');
 const sendApproveForm = require('../../utils/sendApproveForm');
+const disableButton = require('../../components/disableButton');
 
 module.exports = async (interaction) => {
   if (interaction.isModalSubmit()) {
@@ -25,7 +18,7 @@ module.exports = async (interaction) => {
       const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
       sendEmbedCaseAlert(alertChannel, _case);
 
-      await interaction.reply({ content: 'Your apology request was received successfully!' });
+      await interaction.reply({ content: 'Your apology request was received successfully! This will be sent to the corresponding user and awaiting response.' });
       // Send request to offender thread
       const { offenderId,
               victimId,
@@ -43,7 +36,12 @@ module.exports = async (interaction) => {
         target: offender,
         _case: _case,
         customId: "apologyResponse",
-        role: "offender",
+        role: "Offender",
+      });
+
+      // Disable the buttons
+      await interaction.message.edit({
+        components: [disableButton("Yes")],
       });
     }
     else if (interaction.customId.includes('apologyResponse')) {
@@ -58,7 +56,12 @@ module.exports = async (interaction) => {
       const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
       sendEmbedCaseAlert(alertChannel, _case);
 
-      await interaction.reply({ content: 'Your apology response was received successfully!' });
+      // Disable the buttons
+      await interaction.message.edit({
+        components: [disableButton("Yes")],
+      });
+
+      await interaction.reply({ content: 'Your apology response was received and will be reviewed accordingly.' });
     }
     else if (interaction.customId.includes('remarks')) {
       const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
@@ -70,6 +73,8 @@ module.exports = async (interaction) => {
       const guild = await Guild.findOne({ guildId: interaction.guild.id });
       const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
       sendEmbedCaseAlert(alertChannel, _case);
+
+      // TODO: Disable button (could be either yes or no -> need to embed it here!)
     }
   }
   else return;

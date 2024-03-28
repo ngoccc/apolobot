@@ -7,8 +7,8 @@ const {
 } = require('discord.js');
 const Case = require('../models/Case');
 const handleOffenderResponse = require('./handleOffenderResponse');
-const sendRemarksForm = require('./sendRemarksForm');
 const notifyUsers = require('./notifyUsers');
+const disableButton = require('../components/disableButton');
 
 module.exports = (channel, _case) => {
   const {
@@ -51,7 +51,7 @@ module.exports = (channel, _case) => {
     caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
     const modApprove = handleOffenderResponse(channel, _case, caseAlertEmbed); // This func returns 1 if offender response was mod-approved, otherwise 0
     if (modApprove) {
-      // TODO: send embed saying that mod approve
+      // TODO: send embed saying that mod approve?
     } else {
       // decline = remarks = let the event handler do the rest?
     }
@@ -93,6 +93,10 @@ module.exports = (channel, _case) => {
                 await channel.permissionOverwrites.edit(offender.id, { SendMessages: true });
               }
             });
+          // Disable the buttons
+          await interaction.message.edit({
+            components: [disableButton("Unmuted Offender")],
+          });
         } catch (error) {
           console.log(`Error: ${error}`);
           return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
@@ -100,8 +104,7 @@ module.exports = (channel, _case) => {
         _case.approvalStatus = "All Approved";
         _case.processStep = "Case Closed - Succeeded to Apologize";
         await _case.save();
-        interaction.reply({ content: 'Successfully unmuted offender!', ephemeral: true });
-        sendRemarksForm(interaction, extractedId);
+        await interaction.reply({ content: 'Successfully unmuted offender!' });
         // notify victim and offender
         const victimThread = await interaction.client.channels.fetch(victimThreadId);
         const offenderThread = await interaction.client.channels.fetch(offenderThreadId);

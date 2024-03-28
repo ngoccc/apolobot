@@ -8,6 +8,7 @@ const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const handleVictimFinalReview = require('./handleVictimFinalReview');
 const sendRemarksForm = require('./sendRemarksForm');
+const disableButton = require('../components/disableButton');
 
 module.exports = (channel, _case, caseAlertEmbed) => {
   const approve = new ButtonBuilder()
@@ -38,6 +39,11 @@ module.exports = (channel, _case, caseAlertEmbed) => {
       _case.processStep = 'Mod Approved';
       await _case.save();
 
+      // Disable the buttons
+      await interaction.message.edit({
+        components: [disableButton("Approved")],
+      });
+
       // Send apology to victim
       const {
         victimId,
@@ -56,6 +62,7 @@ module.exports = (channel, _case, caseAlertEmbed) => {
       );
 
       await interaction.reply('Apology response sent to victim!.', { ephemeral: true });
+
       return 1;
     } else if (response.includes('decline')) {
 
@@ -65,6 +72,7 @@ module.exports = (channel, _case, caseAlertEmbed) => {
       _case.processStep = 'Case Closed - Failed to Apologize';
       _case.approvalStatus = 'Moderator Declined';
       await _case.save();
+
       return 0;
    }
   });
