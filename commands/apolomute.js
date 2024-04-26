@@ -148,16 +148,18 @@ module.exports = {
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
       });
+
+      // Add the offender to the thread
+      await offenderThread.members.add(offender);
+
+      // Send a message to the offender in the private thread
+      offenderThread.send(`You have been muted in all channels except this private thread.\nReason: ${reason}\nThis decision will be further reviewed by the moderation team and involving community member(s).`);
+
     } catch (error) {
       console.log(`Error: ${error}`);
 			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for offender', ephemeral: true });
     }
 
-    // Add the victim to the thread
-    await offenderThread.members.add(offender);
-
-    // Send a message to the offender in the private thread
-    offenderThread.send(`You have been muted in all channels except this private thread.\nReason: ${reason}\nThis decision will be further reviewed by the moderation team and involving community member(s).`);
     _case.offenderThreadId = offenderThread.id;
     await _case.save();
 
@@ -174,28 +176,28 @@ module.exports = {
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
       });
+      // Add the victim to the thread
+      await victimThread.members.add(victim);
+
+      // Send form to victim
+      sendApproveForm({
+        type: 'yn',
+        msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
+        thread: victimThread,
+        target: victim,
+        _case: _case,
+        customId: "apologyRequest",
+        role: "Victim",
+      });
     } catch (error) {
       console.log(`Error: ${error}`);
 			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for victim' });
     }
 
-    // Add the victim to the thread
-    await victimThread.members.add(victim);
-
+    // Update case
     _case.processStep = 'Waiting for Victim Request';
     _case.victimThreadId = victimThread.id;
     await _case.save();
-
-    // Send form to victim
-    sendApproveForm({
-      type: 'yn',
-      msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
-      thread: victimThread,
-      target: victim,
-      _case: _case,
-      customId: "apologyRequest",
-      role: "Victim",
-    });
 
     // [testing] In the background, unmute the offender after the duration
     setTimeout(() => {
