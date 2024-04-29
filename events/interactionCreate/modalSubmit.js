@@ -31,7 +31,9 @@ module.exports = async (interaction) => {
 
       sendApproveForm({
         type: 'yn',
-        msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by providing them an apology to recover from the incident.\nHere is the apology request from ${victim.displayName}: ${victimRequest}.\nWould you want to proceed?`,
+        msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by providing them an apology to recover from the incident.\n \
+Here is the apology request from ${victim.displayName}: ${victimRequest}.\n \
+Would you want to proceed?`,
         thread: offenderThread,
         target: offender,
         _case: _case,

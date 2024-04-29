@@ -61,6 +61,7 @@ module.exports = {
     const duration = interaction.options.getString('duration'); // 1d, 1 day, 1s 5s, 5m
     const reason = interaction.options.getString('reason');
     const proof = interaction.options.getAttachment('proof');
+    const { default: prettyMs } = await import('pretty-ms');
 
     await interaction.deferReply({ ephemeral: true });
 
@@ -135,7 +136,7 @@ module.exports = {
 
       // Also mute the given thread
     } catch (error) {
-      console.log(`Error: ${error}`);
+      console.log(`Mute Error: ${error}`);
 			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
     }
 
@@ -153,7 +154,8 @@ module.exports = {
       await offenderThread.members.add(offender);
 
       // Send a message to the offender in the private thread
-      offenderThread.send(`You have been muted in all channels except this private thread.\nReason: ${reason}\nThis decision will be further reviewed by the moderation team and involving community member(s).`);
+      offenderThread.send(`You have been muted in all channels except this private thread for ${prettyMs(msDuration, { verbose: true })}.\nReason: ${reason}\n
+This decision will be further reviewed by the moderation team and involving community member(s).`);
 
     } catch (error) {
       console.log(`Error: ${error}`);
@@ -182,7 +184,8 @@ module.exports = {
       // Send form to victim
       sendApproveForm({
         type: 'yn',
-        msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?`,
+        msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?\n \
+The request will expire in ${prettyMs(msDuration, { verbose: true })}`,
         thread: victimThread,
         target: victim,
         _case: _case,
@@ -218,7 +221,7 @@ module.exports = {
             }
           });
       } catch (error) {
-        console.log(`Error: ${error}`);
+        console.log(`Unmute Error: ${error}`);
         return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
       }
     }, msDuration);
