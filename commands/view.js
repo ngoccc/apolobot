@@ -31,6 +31,7 @@ module.exports = {
       const {
         duration,
         reason,
+        proof,
         modId,
         victimId,
         offenderId,
@@ -52,6 +53,9 @@ module.exports = {
           { name: 'Mod', value: `<@${modId}>`, inline: true },
           { name: 'Process', value: `${processStep}` })
 
+      if (proof) {
+        caseAlertEmbed.setImage(proof);
+      }
       if (approvalStatus) {
         caseAlertEmbed.addFields({ name: 'Approval Status', value: `${approvalStatus}` });
       }
@@ -70,6 +74,4 @@ module.exports = {
 			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
     }
   },
-
-  devOnly: true,
 };

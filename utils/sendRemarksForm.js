@@ -15,7 +15,7 @@ module.exports = async (interaction, extractedId) => {
   const input = new TextInputBuilder()
     .setCustomId('remarks')
       // The label is the prompt the user sees for this input
-    .setLabel("Please provide any remarks on your decision.")
+    .setLabel("Please provide any remark on your decision. (Enter 0 if no remarks).")
       // Short means only a single line of text
     .setStyle(TextInputStyle.Paragraph)
   // .setMaxLength(1000)

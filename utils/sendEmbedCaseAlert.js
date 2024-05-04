@@ -12,6 +12,7 @@ const disableButton = require('../components/disableButton');
 
 module.exports = (channel, _case) => {
   const {
+    proof,
     localCaseId,
     modId,
     victimId,
@@ -36,6 +37,10 @@ module.exports = (channel, _case) => {
       { name: 'Mod', value: `<@${modId}>`, inline: true },
       { name: 'Process', value: `${processStep}` })
 
+
+  if (proof && processStep === 'Waiting for Victim Request') {
+    caseAlertEmbed.setImage(proof);
+  }
   if (remarks) {
     caseAlertEmbed.addFields({ name: 'Remarks', value: `${remarks}` });
   }

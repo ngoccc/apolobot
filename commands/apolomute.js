@@ -98,7 +98,7 @@ module.exports = {
       modId: mod.id,
       duration: duration,
       reason: reason,
-      proof: proof,
+      proof: proof ? proof.url : null,
       createdOn: new Date(),
       offenderId: offender.id,
       victimId: victim.id,
@@ -144,7 +144,7 @@ module.exports = {
     let offenderThread;
     try {
       offenderThread = await interaction.channel.threads.create({
-        name: `case-offender-${offender.displayName}-${victim.displayName}`,
+        name: `apology-${offender.displayName}-${victim.displayName}`,
         type: ChannelType.PrivateThread,
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
@@ -173,7 +173,7 @@ This decision will be further reviewed by the moderation team and involving comm
     let victimThread;
     try {
       victimThread = await interaction.channel.threads.create({
-        name: `case-victim-${offender.displayName}-${victim.displayName}`,
+        name: `apology-${offender.displayName}-${victim.displayName}`,
         type: ChannelType.PrivateThread,
         reason: 'apolobot-testing', // TODO: fix this
         invitable: false,
@@ -226,6 +226,4 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}`,
       }
     }, msDuration);
   },
-
-  devOnly: true,
 };

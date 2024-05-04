@@ -82,5 +82,4 @@ module.exports = {
     sendEmbedCaseAlert(alertChannel, _case);
     return interaction.reply({ content: `Successfully abort case ${caseId}!`, ephemeral: true });
   },
-  devOnly: true,
 };
