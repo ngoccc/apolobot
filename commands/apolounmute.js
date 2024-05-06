@@ -48,9 +48,6 @@ module.exports = {
       return interaction.reply({ content: `Case ${caseId} has already been resolved`, ephemeral: true });
     }
 
-    // TODO: implement more later (alert n stuffs) - for now just rm it for testing
-
-    console.log('should be here!!');
     try {
       interaction.guild.channels.cache
         .filter(
@@ -77,6 +74,15 @@ module.exports = {
     _case.remarks = reason;
     await _case.save();
 
+    // Alert offender and victim that the case was aborted
+    const { victimThreadId,
+            offenderThreadId,
+          } = _case;
+    const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
+    const victimThread = await interaction.client.channels.fetch(victimThreadId);
+    notifyUsers(_case, [victimThread, offenderThread]);
+
+    // Alert mod
     const guild = await Guild.findOne({ guildId: interaction.guild.id });
     const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
     sendEmbedCaseAlert(alertChannel, _case);

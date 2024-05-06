@@ -27,8 +27,20 @@ module.exports = (_case, channels) => {
       let offenderEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setDescription(`This case was rejected by the other user.\nYou may now close or leave this thread`);
+      channels[1].send({ embeds: [offenderEmbed] });
+    } else if (approvalStatus == 'Aborted') {
+      // victim
+      let victimEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setDescription(`This case was aborted by the moderator.\nYou may now close or leave this thread`);
       channels[0].send({ embeds: [victimEmbed] });
-    };
+
+      // offender
+      let offenderEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setDescription(`This case was aborted by the moderator.\nYou may now close or leave this thread`);
+      channels[1].send({ embeds: [offenderEmbed] });
+    }
   } else return;
 }
 

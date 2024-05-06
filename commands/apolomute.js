@@ -165,7 +165,6 @@ This decision will be further reviewed by the moderation team and involving comm
     _case.offenderThreadId = offenderThread.id;
     await _case.save();
 
-    // TODO: might add proof here if later implemented
     interaction.editReply({ content: `${offender} has been muted from the server\nReason: ${reason}` });
 
     // Send a private thread to victim
