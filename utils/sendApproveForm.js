@@ -9,6 +9,7 @@ const {
 const sendRemarksForm = require('./sendRemarksForm');
 const notifyUsers = require('./notifyUsers');
 const Case = require('../models/Case');
+const disableButton = require('../components/disableButton');
 
 // sendApproveForm('yn', "the mod team has...", victimThread, interaction, victim, _case, apologyResponse);
 module.exports = async (args) => {
@@ -78,7 +79,7 @@ module.exports = async (args) => {
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
       let _case = await Case.findOne({ _id: extractedId });
       _case.processStep = 'Case Closed - Failed to Apologize';
-      _case.approvalStatus = `${role} Declined `;
+      _case.approvalStatus = `${role} Declined`;
       await _case.save();
 
       sendRemarksForm(interaction, extractedId);
@@ -88,11 +89,8 @@ module.exports = async (args) => {
       notifyUsers(_case, [victimThread, offenderThread]);
 
       // Disable the buttons
-      row.components[0].setDisabled(true);
-      row.components[1].setDisabled(true);
-      interaction.editReply({
-        content: `${msg}`,
-        components: [row],
+      await interaction.message.edit({
+        components: [disableButton("No")],
       });
     }
   });

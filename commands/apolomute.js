@@ -183,8 +183,8 @@ This decision will be further reviewed by the moderation team and involving comm
       // Send form to victim
       sendApproveForm({
         type: 'yn',
-        msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?\n \
-The request will expire in ${prettyMs(msDuration, { verbose: true })}`,
+        msg: `${victim}, our moderator ${mod.displayName} has observed inappropriate behavior from ${offender.displayName}, and took action by muting the user. Do you want to give them a second chance by requesting an apology?\n\
+The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
         thread: victimThread,
         target: victim,
         _case: _case,
