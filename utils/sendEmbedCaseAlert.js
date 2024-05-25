@@ -13,6 +13,8 @@ const disableButton = require('../components/disableButton');
 module.exports = (channel, _case) => {
   const {
     proof,
+    duration,
+    reason,
     localCaseId,
     modId,
     victimId,
@@ -38,8 +40,12 @@ module.exports = (channel, _case) => {
       { name: 'Process', value: `${processStep}` })
 
 
-  if (proof && processStep === 'Waiting for Victim Request') {
-    caseAlertEmbed.setImage(proof);
+  if (processStep === 'Waiting for Victim Request') {
+    if (proof) {
+      caseAlertEmbed.setImage(proof);
+    }
+    caseAlertEmbed.addFields({ name: 'Duration', value: `${duration}` });
+    caseAlertEmbed.addFields({ name: 'Reason', value: `${reason}` });
   }
   if (remarks) {
     caseAlertEmbed.addFields({ name: 'Remarks', value: `${remarks}` });
@@ -100,7 +106,7 @@ module.exports = (channel, _case) => {
                     'SendMessagesInThreads': true,
                     'SendVoiceMessages': true,
                   });
-              }
+                }
             });
           // Disable the buttons
           await interaction.message.edit({

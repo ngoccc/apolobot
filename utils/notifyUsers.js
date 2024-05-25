@@ -81,6 +81,17 @@ module.exports = (_case, channels) => {
         .setDescription("This case was aborted by the moderator.\nYou may now close or leave this thread.");
       channels[1].send({ embeds: [offenderEmbed] });
     }
+  } else if (processStep === 'Case Closed - Expired') {
+    let victimEmbed = new EmbedBuilder()
+      .setColor(0x0099FF)
+      .setDescription("This case has expired.\nYou may now close or leave this thread.");
+    channels[0].send({ embeds: [victimEmbed] });
+
+    // offender
+    let offenderEmbed = new EmbedBuilder()
+      .setColor(0x0099FF)
+      .setDescription("This case has expired.\nYou may now close or leave this thread.");
+    channels[1].send({ embeds: [offenderEmbed] });
   } else return;
 }
 

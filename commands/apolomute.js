@@ -13,6 +13,7 @@ const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const sendEmbedCaseAlert = require('../utils/sendEmbedCaseAlert');
 const sendApproveForm = require('../utils/sendApproveForm');
+const notifyUsers = require('../utils/notifyUsers');
 
 const ms = require('ms');
 
@@ -206,21 +207,21 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
     await _case.save();
 
     // [testing] In the background, unmute the offender after the duration
-    setTimeout(() => {
-      try {
-        interaction.guild.channels.cache
-          .filter(
-            (channel) =>
-              ![
-                'GUILD_DIRECTORY',
-                'GUILD_NEWS_THREAD',
-                'GUILD_PRIVATE_THREAD',
-                'GUILD_PUBLIC_THREAD',
-              ].includes(channel.type),
-          )
-          .forEach(async (channel) => {
-            if (channel.type === 0 || channel.type === 2) {
-              if (!channel.permissionsFor(offender).toArray().includes('SendMessages')) {
+    setTimeout(async () => {
+      if (!_case.processStep.includes("Case Closed")) {
+        try {
+          interaction.guild.channels.cache
+            .filter(
+              (channel) =>
+                ![
+                  'GUILD_DIRECTORY',
+                  'GUILD_NEWS_THREAD',
+                  'GUILD_PRIVATE_THREAD',
+                  'GUILD_PUBLIC_THREAD',
+                ].includes(channel.type),
+            )
+            .forEach(async (channel) => {
+              if (channel.type === 0 || channel.type === 2) {
                 // duration timed out:
                 await channel.permissionOverwrites.edit(offender.id,
                   { 'SendMessages': true,
@@ -228,11 +229,16 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
                     'SendVoiceMessages': true,
                   });
               }
-            }
-          });
-      } catch (error) {
-        console.log(`Unmute Error: ${error}`);
-        return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
+            });
+          _case.processStep = "Case Closed - Expired";
+          await _case.save();
+          // notify users (victim, offender, mod)
+          notifyUsers(_case, [victimThread, offenderThread]);
+          sendEmbedCaseAlert(alertChannel, _case);
+        } catch (error) {
+          console.log(`Unmute Error: ${error}`);
+          return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
+        }
       }
     }, msDuration);
   },
