@@ -54,5 +54,4 @@ module.exports = {
 			return interaction.reply({ content: 'An error occurred while configuring the channel.', ephemeral: true });
     }
   },
-  devOnly: true,
 };
