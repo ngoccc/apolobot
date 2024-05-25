@@ -2,6 +2,7 @@ const Case = require('../../models/Case');
 const Guild = require('../../models/Guild');
 const sendEmbedCaseAlert = require('../../utils/sendEmbedCaseAlert');
 const sendApproveForm = require('../../utils/sendApproveForm');
+const notifyUsers = require('../../utils/notifyUsers');
 const disableButton = require('../../components/disableButton');
 
 module.exports = async (interaction) => {
@@ -78,7 +79,23 @@ Would you want to proceed?`,
       sendEmbedCaseAlert(alertChannel, _case);
 
       // TODO: Disable button (could be either yes or no -> need to embed it here!)
+      // Disable button
+      // Case 1: Decline (any of the people declined)
+      const { approvalStatus } = _case;
+      if (approvalStatus.includes('Declined')) {
+        await interaction.message.edit({
+          components: [disableButton("Declined")],
+        });
+        // notify victim and offender
+        const victimThread = await interaction.client.channels.fetch(_case.victimThreadId);
+        const offenderThread = await interaction.client.channels.fetch(_case.offenderThreadId);
+        notifyUsers(_case, [victimThread, offenderThread]);
+      } else {
+        // Case 2: All approved
+        await interaction.message.edit({
+          components: [disableButton("Approved")],
+        });
+      }
     }
-  }
-  else return;
+  } else return;
 };

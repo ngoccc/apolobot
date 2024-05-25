@@ -130,7 +130,11 @@ module.exports = {
         )
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
-            await channel.permissionOverwrites.create(offender.id, { SendMessages: false });
+            await channel.permissionOverwrites.create(offender.id,
+              { 'SendMessages': false,
+                'SendMessagesInThreads': false,
+                'SendVoiceMessages': false,
+              });
           }
         });
 
@@ -154,7 +158,7 @@ module.exports = {
       await offenderThread.members.add(offender);
 
       // Send a message to the offender in the private thread
-      offenderThread.send(`You have been muted in all channels except this private thread for ${prettyMs(msDuration, { verbose: true })}.\nReason: ${reason}\n
+      offenderThread.send(`You have been muted in all channels for ${prettyMs(msDuration, { verbose: true })}.\nReason: ${reason}\n
 This decision will be further reviewed by the moderation team and involving community member(s).`);
 
     } catch (error) {
@@ -216,7 +220,14 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
           )
           .forEach(async (channel) => {
             if (channel.type === 0 || channel.type === 2) {
-              await channel.permissionOverwrites.edit(offender.id, { SendMessages: true });
+              if (!channel.permissionsFor(offender).toArray().includes('SendMessages')) {
+                // duration timed out:
+                await channel.permissionOverwrites.edit(offender.id,
+                  { 'SendMessages': true,
+                    'SendMessagesInThreads': true,
+                    'SendVoiceMessages': true,
+                  });
+              }
             }
           });
       } catch (error) {

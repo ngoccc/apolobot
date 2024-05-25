@@ -9,7 +9,7 @@ const Guild = require('../models/Guild');
 const sendRemarksForm = require('./sendRemarksForm');
 const disableButton = require('../components/disableButton');
 
-module.exports = (victimThread, _case, msg) => {
+module.exports = async (victimThread, _case, msg) => {
   const approve = new ButtonBuilder()
                   .setCustomId(`approve-${_case.id}`)
                   .setLabel('Approve')
@@ -21,7 +21,7 @@ module.exports = (victimThread, _case, msg) => {
   const row = new ActionRowBuilder()
                   .addComponents(approve, decline);
 
-  victimThread.send({
+  await victimThread.send({
     content: `${msg}`,
     components: [row],
   });
@@ -40,13 +40,6 @@ module.exports = (victimThread, _case, msg) => {
       await _case.save();
 
       sendRemarksForm(interaction, extractedId);
-
-      // Disable the buttons
-      await interaction.message.edit({
-        components: [disableButton("Approved")],
-      });
-
-      return 1;
 
     } else if (response.includes('decline')) {
       // Send a thank you message

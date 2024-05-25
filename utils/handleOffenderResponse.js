@@ -65,13 +65,13 @@ module.exports = (channel, _case, caseAlertEmbed) => {
 
       return 1;
     } else if (response.includes('decline')) {
-
       const extractedId = (response.match(/^[^-]+-(.+)$/) || [])[1];
-      sendRemarksForm(interaction, extractedId);
 
       _case.processStep = 'Case Closed - Failed to Apologize';
       _case.approvalStatus = 'Moderator Declined';
       await _case.save();
+
+      sendRemarksForm(interaction, extractedId);
 
       return 0;
    }

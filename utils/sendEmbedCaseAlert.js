@@ -95,7 +95,11 @@ module.exports = (channel, _case) => {
             )
             .forEach(async (channel) => {
               if (channel.type === 0 || channel.type === 2) {
-                await channel.permissionOverwrites.edit(offender.id, { SendMessages: true });
+                await channel.permissionOverwrites.edit(offender.id,
+                  { 'SendMessages': true,
+                    'SendMessagesInThreads': true,
+                    'SendVoiceMessages': true,
+                  });
               }
             });
           // Disable the buttons
