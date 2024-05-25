@@ -88,11 +88,17 @@ module.exports = {
         ephemeral: true,
       });
       return;
-
     };
 
     // Create a new case in the database
     let guild = await Guild.findOne({ guildId: interaction.guild.id });
+    if (!guild) {
+      interaction.reply({
+        content: 'You have to set up an alert channel first!',
+        ephemeral: true,
+      });
+      return;
+    }
     let _case = new Case({
       guildId: interaction.guild.id,
       localCaseId: guild.totalCase + 1,
