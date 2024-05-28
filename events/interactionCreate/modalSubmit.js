@@ -71,7 +71,6 @@ Would you want to proceed?`,
       const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
       let _case = await Case.findOne({ _id: extractedId });
       _case.remarks = interaction.fields.getTextInputValue('remarks');
-      await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community!' });
 
       // remarks is always in the end so send embed update here
       const guild = await Guild.findOne({ guildId: interaction.guild.id });
@@ -83,6 +82,7 @@ Would you want to proceed?`,
       // Case 1: Decline (any of the people declined)
       const { approvalStatus } = _case;
       if (approvalStatus.includes('Declined')) {
+        await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community!' });
         await interaction.message.edit({
           components: [disableButton("Declined")],
         });
@@ -92,6 +92,7 @@ Would you want to proceed?`,
         notifyUsers(_case, [victimThread, offenderThread]);
       } else {
         // Case 2: All approved
+        await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community! This case will be finalized by the moderation team and updates will be sent shortly.' });
         await interaction.message.edit({
           components: [disableButton("Approved")],
         });
