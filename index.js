@@ -1,10 +1,7 @@
-require('dotenv').config();
 const { Client, IntentsBitField } = require('discord.js');
 const { CommandHandler } = require('djs-commander');
 const path = require('path');
 const mongoose = require('mongoose');
-
-const { TOKEN, MONGODB_URI } = process.env;
 
 const client = new Client({
   intents: [
@@ -26,7 +23,7 @@ new CommandHandler({
 
 (async () => {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("Connected to DB.");
 
   } catch (error) {
@@ -35,4 +32,4 @@ new CommandHandler({
 
 })();
 
-client.login(TOKEN);
+client.login(process.env.TOKEN);
