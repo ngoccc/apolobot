@@ -92,7 +92,7 @@ Would you want to proceed?`,
         notifyUsers(_case, [victimThread, offenderThread]);
       } else {
         // Case 2: All approved
-        await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community! This case will be finalized by the moderation team and updates will be sent shortly.' });
+        await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community! The case will be finalized by the moderation team and updates will be sent shortly.' });
         await interaction.message.edit({
           components: [disableButton("Approved")],
         });
