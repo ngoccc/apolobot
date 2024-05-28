@@ -68,7 +68,7 @@ module.exports = (_case, channels) => {
         .setDescription("Your apology was not approved by the other user. You will continue to be muted for the rest of the specified duration\nYou may now close or leave this thread.");
       channels[1].send({ embeds: [offenderEmbed] });
 
-    } else if (approvalStatus == 'Aborted') {
+    } else if (approvalStatus === 'Aborted') {
       // victim
       let victimEmbed = new EmbedBuilder()
         .setColor(0x0099FF)

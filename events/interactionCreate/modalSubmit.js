@@ -71,7 +71,7 @@ Would you want to proceed?`,
       const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
       let _case = await Case.findOne({ _id: extractedId });
       _case.remarks = interaction.fields.getTextInputValue('remarks');
-      await interaction.reply({ content: 'Your response were received successfully. Your perspective are valuable to improve the community!' });
+      await interaction.reply({ content: 'Your response was received successfully. Your perspective are valuable to improve the community!' });
 
       // remarks is always in the end so send embed update here
       const guild = await Guild.findOne({ guildId: interaction.guild.id });

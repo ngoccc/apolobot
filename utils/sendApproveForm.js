@@ -83,15 +83,6 @@ module.exports = async (args) => {
       await _case.save();
 
       sendRemarksForm(interaction, extractedId);
-      // notify victim and offender
-      const victimThread = await interaction.client.channels.fetch(_case.victimThreadId);
-      const offenderThread = await interaction.client.channels.fetch(_case.offenderThreadId);
-      notifyUsers(_case, [victimThread, offenderThread]);
-
-      // Disable the buttons
-      await interaction.message.edit({
-        components: [disableButton("No")],
-      });
     }
   });
 };
