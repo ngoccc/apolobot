@@ -5,6 +5,7 @@ const {
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const sendEmbedCaseAlert = require('../utils/sendEmbedCaseAlert');
+const notifyUsers = require('../utils/notifyUsers');
 
 const ms = require('ms');
 
@@ -38,7 +39,7 @@ module.exports = {
 		const caseId = await interaction.options.getNumber('case-id');
 		const reason = await interaction.options.getString('reason');
 
-    let _case = await Case.findOne({ localCaseId: caseId });
+    let _case = await Case.findOne({ guildId: interaction.guild.id, localCaseId: caseId });
 
     if (!_case) {
       return interaction.reply({ content: `Cannot find case with id ${caseId}`, ephemeral: true });
@@ -49,7 +50,7 @@ module.exports = {
     }
 
     try {
-      interaction.guild.channels.cache
+      await interaction.guild.channels.cache
         .filter(
           (channel) =>
             ![
@@ -61,31 +62,34 @@ module.exports = {
         )
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
-            await channel.permissionOverwrites.edit(_case.offenderId, { SendMessages: true });
+            await channel.permissionOverwrites.edit(_case.offenderId,
+              { 'SendMessages': true,
+                'SendMessagesInThreads': true,
+                'SendVoiceMessages': true,
+              });
           }
         });
+      _case.approvalStatus = 'Aborted';
+      _case.processStep = 'Case Closed - Failed to Apologize';
+      _case.remarks = reason;
+      await _case.save();
+
+      // Alert offender and victim that the case was aborted
+      const { victimThreadId,
+              offenderThreadId,
+            } = _case;
+      const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
+      const victimThread = await interaction.client.channels.fetch(victimThreadId);
+      notifyUsers(_case, [victimThread, offenderThread]);
+
+      // Alert mod
+      const guild = await Guild.findOne({ guildId: interaction.guild.id });
+      const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
+      sendEmbedCaseAlert(alertChannel, _case);
+      return interaction.reply({ content: `Successfully abort case ${caseId}!`, ephemeral: true });
     } catch (error) {
-      console.log(`Error: ${error}`);
       return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
     }
 
-    _case.approvalStatus = 'Aborted';
-    _case.processStep = 'Case Closed - Failed to Apologize';
-    _case.remarks = reason;
-    await _case.save();
-
-    // Alert offender and victim that the case was aborted
-    const { victimThreadId,
-            offenderThreadId,
-          } = _case;
-    const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
-    const victimThread = await interaction.client.channels.fetch(victimThreadId);
-    notifyUsers(_case, [victimThread, offenderThread]);
-
-    // Alert mod
-    const guild = await Guild.findOne({ guildId: interaction.guild.id });
-    const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
-    sendEmbedCaseAlert(alertChannel, _case);
-    return interaction.reply({ content: `Successfully abort case ${caseId}!`, ephemeral: true });
   },
 };
