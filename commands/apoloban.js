@@ -31,4 +31,5 @@ module.exports = {
 		}
   },
   devOnly: true,
+  deleted: true,
 };
