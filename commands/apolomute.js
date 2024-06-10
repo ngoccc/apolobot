@@ -50,7 +50,7 @@ module.exports = {
               .setName('proof')
               .setDescription('Proof (e.g image, screenshot) for the given case.')
           )
-          .setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers)
+          .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
           .setDMPermission(false),
 
   run: async ({ interaction }) => {

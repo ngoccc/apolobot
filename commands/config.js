@@ -10,7 +10,9 @@ module.exports = {
         .setName('alert-channel')
         .setDescription('The channel to receive Apolobot alerts.')
         .setRequired(true)
-    ),
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
+    .setDMPermission(false),
   run: async ({ interaction }) => {
     // Check conditions
     if (!interaction.member.permissions.has('ADMINISTRATOR'))

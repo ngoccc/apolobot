@@ -24,7 +24,7 @@ module.exports = {
               .setDescription('The reason for unmuting.')
               .setRequired(true)
           )
-          .setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers)
+          .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
           .setDMPermission(false),
 
   run: async ({ interaction }) => {
