@@ -2,12 +2,6 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   ChannelType,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
 } = require('discord.js');
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
@@ -199,8 +193,7 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
         thread: victimThread,
         target: victim,
         _case: _case,
-        customId: "apologyRequest",
-        role: "Victim",
+        customId: "apology-request",
       });
     } catch (error) {
       console.log(`Error: ${error}`);

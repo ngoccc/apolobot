@@ -5,13 +5,20 @@ const sendApproveForm = require('../../utils/sendApproveForm');
 const notifyUsers = require('../../utils/notifyUsers');
 const disableButton = require('../../components/disableButton');
 
+function extractId(str) {
+    // Split the string by hyphens
+    let parts = str.split('-');
+    // Return the last element of the array
+    return parts[parts.length - 1];
+}
+
 module.exports = async (interaction) => {
   if (interaction.isModalSubmit()) {
-    if (interaction.customId.includes('apologyRequest')) {
-      const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
+    if (interaction.customId.includes('apology-request')) {
+      const extractedId = extractId(interaction.customId);
       let _case = await Case.findOne({ _id: extractedId });
       _case.processStep = 'Victim Requested';
-      _case.victimRequest = interaction.fields.getTextInputValue('apologyRequest');
+      _case.victimRequest = interaction.fields.getTextInputValue('apology-request');
       await _case.save();
 
       // Send request to mod
@@ -39,8 +46,7 @@ Would you want to proceed?`,
         thread: offenderThread,
         target: offender,
         _case: _case,
-        customId: "apologyResponse",
-        role: "Offender",
+        customId: "apology-response",
       });
 
       // Disable the buttons
@@ -48,11 +54,11 @@ Would you want to proceed?`,
         components: [disableButton("Yes")],
       });
     }
-    else if (interaction.customId.includes('apologyResponse')) {
-      const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
+    else if (interaction.customId.includes('apology-response')) {
+      const extractedId = extractId(interaction.customId);
       let _case = await Case.findOne({ _id: extractedId });
       _case.processStep = 'Offender Responded';
-      _case.offenderResponse = interaction.fields.getTextInputValue('apologyResponse');
+      _case.offenderResponse = interaction.fields.getTextInputValue('apology-response');
       await _case.save();
 
       // Send request to mod
@@ -68,7 +74,7 @@ Would you want to proceed?`,
       await interaction.reply({ content: 'Your apology response was received and will be reviewed accordingly.' });
     }
     else if (interaction.customId.includes('remarks')) {
-      const extractedId = (interaction.customId.match(/^[^-]+-(.+)$/) || [])[1];
+      const extractedId = extractId(interaction.customId);
       let _case = await Case.findOne({ _id: extractedId });
       _case.remarks = interaction.fields.getTextInputValue('remarks');
       await interaction.reply({ content: 'Your response were received successfully. Your perspective are valuable to improve the community!' });

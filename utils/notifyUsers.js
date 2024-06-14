@@ -26,7 +26,7 @@ module.exports = (_case, channels) => {
       // offender
       let offenderEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setDescription("This case was rejected by the other user.\nYou may now close or leave this thread.");
+        .setDescription("This case was rejected by the involving user.\nYou may now close or leave this thread.");
       channels[1].send({ embeds: [offenderEmbed] });
 
     } else if (approvalStatus === 'Offender Declined') {
