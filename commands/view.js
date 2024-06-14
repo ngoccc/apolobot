@@ -17,7 +17,7 @@ module.exports = {
               .setDescription('The id of the case.')
               .setRequired(true)
           )
-          .setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers)
+          .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
           .setDMPermission(false),
 
   run: async ({ interaction }) => {
