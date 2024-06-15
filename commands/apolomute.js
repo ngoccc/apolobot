@@ -77,7 +77,7 @@ module.exports = {
     }
 
     if (!interaction.inGuild()) {
-      interaction.reply({
+      await interaction.editReply({
         content: 'You can only run this command inside a server.',
         ephemeral: true,
       });
@@ -87,7 +87,7 @@ module.exports = {
     // Create a new case in the database
     let guild = await Guild.findOne({ guildId: interaction.guild.id });
     if (!guild) {
-      interaction.reply({
+      await interaction.editReply({
         content: 'You have to set up an alert channel first!',
         ephemeral: true,
       });
@@ -170,7 +170,7 @@ This decision will be further reviewed by the moderation team and involving comm
     _case.offenderThreadId = offenderThread.id;
     await _case.save();
 
-    interaction.editReply({ content: `${offender} has been muted from the server\nReason: ${reason}` });
+    await interaction.editReply({ content: `${offender} has been muted from the server\nReason: ${reason}` });
 
     // Send a private thread to victim
     // Create a private thread
@@ -197,7 +197,7 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
       });
     } catch (error) {
       console.log(`Error: ${error}`);
-			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for victim' });
+			return interaction.reply({ content: 'An error occurred while trying to create a private thread for victim' });
     }
 
     // Update case
