@@ -60,10 +60,42 @@ module.exports = {
 
     await interaction.deferReply({ ephemeral: true });
 
-    // TODO: Check conditions of user
-    // 1. user (offender/victim) doesn't exist in server
-    // 2. user is bot
-    // 3. user's roles
+    // check offender
+    // 1. not admin
+    if (offender.id === interaction.guild.ownerId) {
+      await interaction.editReply("You cannot mute the user because they're the server owner.");
+      return;
+    };
+    // 2. not of higher role
+    const offenderRolePosition = offender.roles.highest.position;
+    const requestUserRolePosition = interaction.member.roles.highest.position;
+    const botRolePosition = interaction.guild.members.me.roles.highest.position;
+
+    if (offenderRolePosition >= requestUserRolePosition) {
+      await interaction.editReply(
+        "You cannot mute the user because they have the same/higher role than you."
+      );
+      return;
+    };
+
+    if (targetUserRolePosition >= botRolePosition) {
+      await interaction.editReply(
+        "I cannot mute the user because they have the same/higher role than me."
+      );
+      return;
+    };
+    // 3. not bot (both offender and victim)
+    if (offender.user.bot) {
+      await interaction.editReply(
+        "The offender should not be a bot!"
+      );
+      return;
+    } else if (victim.user.bot) {
+      await interaction.editReply(
+        "The victim should not be a bot!"
+      );
+      return;
+    }
 
     const msDuration = ms(duration);
     if (isNaN(msDuration)) {
