@@ -78,7 +78,7 @@ module.exports = {
       return;
     };
 
-    if (targetUserRolePosition >= botRolePosition) {
+    if (offenderRolePosition >= botRolePosition) {
       await interaction.editReply(
         "I cannot mute the user because they have the same/higher role than me."
       );
