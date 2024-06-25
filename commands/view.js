@@ -23,7 +23,7 @@ module.exports = {
   run: async ({ interaction }) => {
     // retrieve the case with the given id
 		const searchId = interaction.options.getNumber('id');
-    const _case = await Case.findOne({ localCaseId: searchId });
+    const _case = await Case.findOne({ guildId: interaction.guild.id, localCaseId: searchId });
 
     await interaction.deferReply({ ephemeral: true });
 
