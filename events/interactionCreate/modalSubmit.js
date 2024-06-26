@@ -40,7 +40,7 @@ module.exports = async (interaction) => {
       sendApproveForm({
         type: 'yn',
         msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by giving an apology.\n\
-**Here is the apology request from ${victim.displayName}**:\n ${victimRequest}.\n\
+**Here is the apology request from ${victim.displayName}**:\n${victimRequest}.\n\
 If you proceed with an apology that is accepted by the user, your account mute will be instantly lifted. Otherwise, it will remain for the rest of the intended period.
 Would you want to proceed?`,
         thread: offenderThread,
