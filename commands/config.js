@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  PermissionsBitField,
+} = require('discord.js');
 const Guild = require('../models/Guild');
 
 module.exports = {
@@ -19,16 +23,21 @@ module.exports = {
       return interaction.reply({ content: 'You do not have the required permissions to use this command.', ephemeral: true });
 
     if (!interaction.inGuild()) {
-      interaction.reply({
+      return interaction.reply({
         content: 'You can only run this command inside a server.',
         ephemeral: true,
       });
-      return;
     };
 
+    const targetChannel = interaction.options.getChannel('alert-channel');
+    if (!targetChannel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+      return interaction.reply({
+        content: 'ApoloBot does not have access to the channel. Try adding ApoloBot to the channel or grant it permission to view it first (Edit Channel > Permissions > Add members or roles).',
+        ephemeral: true,
+      });
+    }
+
     try {
-      // Get the mentioned channel
-      const targetChannel = interaction.options.getChannel('alert-channel');
       const targetGuild = interaction.guild;
 
       // Save channel ID to database
