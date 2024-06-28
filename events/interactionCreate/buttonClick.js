@@ -3,6 +3,7 @@ const {
   ActionRowBuilder,
   TextInputBuilder,
   TextInputStyle,
+  PermissionsBitField,
 } = require('discord.js');
 const Case = require('../../models/Case');
 const Guild = require('../../models/Guild');
@@ -40,12 +41,14 @@ module.exports = async (interaction) => {
           )
           .forEach(async (channel) => {
             if (channel.type === 0 || channel.type === 2) {
-              await channel.permissionOverwrites.edit(offender.id,
-                { 'SendMessages': true,
-                  'SendMessagesInThreads': true,
-                  'SendVoiceMessages': true,
-                });
+              if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+                await channel.permissionOverwrites.edit(offender.id,
+                  { 'SendMessages': true,
+                    'SendMessagesInThreads': true,
+                    'SendVoiceMessages': true,
+                  });
               }
+            }
           });
         // Disable the buttons
         await interaction.message.edit({

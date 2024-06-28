@@ -1,6 +1,7 @@
 const {
   SlashCommandBuilder,
   PermissionFlagsBits,
+  PermissionsBitField,
 } = require('discord.js');
 const Case = require('../models/Case');
 const Guild = require('../models/Guild');
@@ -62,11 +63,13 @@ module.exports = {
         )
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
-            await channel.permissionOverwrites.edit(_case.offenderId,
-              { 'SendMessages': true,
-                'SendMessagesInThreads': true,
-                'SendVoiceMessages': true,
-              });
+            if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+              await channel.permissionOverwrites.edit(_case.offenderId,
+                { 'SendMessages': true,
+                  'SendMessagesInThreads': true,
+                  'SendVoiceMessages': true,
+                });
+            }
           }
         });
       _case.approvalStatus = 'Aborted';

@@ -1,6 +1,7 @@
 const {
   SlashCommandBuilder,
   PermissionFlagsBits,
+  PermissionsBitField,
   ChannelType,
 } = require('discord.js');
 const Case = require('../models/Case');
@@ -163,11 +164,13 @@ module.exports = {
         )
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
-            await channel.permissionOverwrites.create(offender.id,
-              { 'SendMessages': false,
-                'SendMessagesInThreads': false,
-                'SendVoiceMessages': false,
-              });
+            if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+              await channel.permissionOverwrites.create(offender.id,
+                { 'SendMessages': false,
+                  'SendMessagesInThreads': false,
+                  'SendVoiceMessages': false,
+                });
+            }
           }
         });
 
@@ -255,11 +258,13 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
             .forEach(async (channel) => {
               if (channel.type === 0 || channel.type === 2) {
                 // duration timed out:
-                await channel.permissionOverwrites.edit(offender.id,
-                  { 'SendMessages': true,
-                    'SendMessagesInThreads': true,
-                    'SendVoiceMessages': true,
-                  });
+                if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+                  await channel.permissionOverwrites.edit(offender.id,
+                    { 'SendMessages': true,
+                      'SendMessagesInThreads': true,
+                      'SendVoiceMessages': true,
+                    });
+                }
               }
             });
           _case.processStep = "Case Closed - Expired";

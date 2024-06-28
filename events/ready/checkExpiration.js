@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require('discord.js');
 const ms = require('ms');
 const Case = require('../../models/Case');
 const Guild = require('../../models/Guild');
@@ -36,11 +37,13 @@ async function checkAndUnmuteCases(guild) {
             .forEach(async (channel) => {
               if (channel.type === 0 || channel.type === 2) {
                 // duration timed out:
-                await channel.permissionOverwrites.edit(_case.offenderId,
-                  { 'SendMessages': true,
-                    'SendMessagesInThreads': true,
-                    'SendVoiceMessages': true,
-                  });
+                if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+                  await channel.permissionOverwrites.edit(_case.offenderId,
+                    { 'SendMessages': true,
+                      'SendMessagesInThreads': true,
+                      'SendVoiceMessages': true,
+                    });
+                }
               }
             });
           _case.processStep = "Case Closed - Expired";
