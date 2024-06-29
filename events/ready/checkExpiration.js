@@ -37,7 +37,7 @@ async function checkAndUnmuteCases(guild) {
             .forEach(async (channel) => {
               if (channel.type === 0 || channel.type === 2) {
                 // duration timed out:
-                if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+                if (channel.permissionsFor(guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
                   await channel.permissionOverwrites.edit(_case.offenderId,
                     { 'SendMessages': true,
                       'SendMessagesInThreads': true,
