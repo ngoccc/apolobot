@@ -243,7 +243,8 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
 
     // [testing] In the background, unmute the offender after the duration
     setTimeout(async () => {
-      if (!_case.processStep.includes("Case Closed")) {
+      let newCase = await Case.findOne({ guildId: interaction.guild.id, localCaseId: _case.localCaseId });
+      if (newCase.processStep !== "Case Closed - Succeeded to Apologize") {
         try {
           interaction.guild.channels.cache
             .filter(
@@ -267,11 +268,13 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
                 }
               }
             });
-          _case.processStep = "Case Closed - Expired";
-          await _case.save();
-          // notify users (victim, offender, mod)
-          notifyUsers(_case, [victimThread, offenderThread]);
-          sendEmbedCaseAlert(alertChannel, _case);
+          if (!newCase.processStep.includes('Case Closed')) {
+            newCase.processStep = "Case Closed - Expired";
+            await newCase.save();
+            // notify users (victim, offender, mod)
+            notifyUsers(newCase, [victimThread, offenderThread]);
+            sendEmbedCaseAlert(alertChannel, newCase);
+          }
         } catch (error) {
           console.log(`Unmute Error: ${error}`);
           return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });

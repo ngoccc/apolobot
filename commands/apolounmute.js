@@ -47,7 +47,7 @@ module.exports = {
     }
 
     if (_case.processStep.includes('Case Closed')) {
-      return interaction.reply({ content: `Case ${caseId} has already been resolved`, ephemeral: true });
+      return interaction.reply({ content: `Case ${caseId} has already been closed`, ephemeral: true });
     }
 
     try {

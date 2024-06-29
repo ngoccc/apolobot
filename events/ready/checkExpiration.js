@@ -21,7 +21,7 @@ async function checkAndUnmuteCases(guild) {
       const currentTime = new Date();
       const expirationTime = new Date(createdOn.getTime() + ms(duration));
 
-      if (!(processStep.includes("Case Closed")) && currentTime > expirationTime) {
+      if (_case.processStep !== "Case Closed - Succeeded to Apologize" && currentTime > expirationTime) {
         // Unmute offender
         try {
           guild.channels.cache
@@ -46,21 +46,22 @@ async function checkAndUnmuteCases(guild) {
                 }
               }
             });
-          _case.processStep = "Case Closed - Expired";
-          await _case.save();
-          // notify users (victim, mod)
-          const { victimThreadId,
-                  offenderThreadId,
-                } = _case;
-          const offenderThread = await guild.channels.fetch(offenderThreadId);
-          const victimThread = await guild.channels.fetch(victimThreadId);
-          notifyUsers(_case, [victimThread, offenderThread]);
-
-          // notify mod
-          let guildDb = await Guild.findOne({ guildId: guild.id });
-          const alertChannel = await guild.channels.fetch(guildDb.alertChannelId)
-            .catch(console.error);
-          sendEmbedCaseAlert(alertChannel, _case);
+          if (!processStep.includes('Case Closed')) {
+            _case.processStep = "Case Closed - Expired";
+            await _case.save();
+            // notify users (victim, offender)
+            const { victimThreadId,
+                    offenderThreadId,
+                  } = _case;
+            const offenderThread = await guild.channels.fetch(offenderThreadId);
+            const victimThread = await guild.channels.fetch(victimThreadId);
+            notifyUsers(_case, [victimThread, offenderThread]);
+            // notify mod
+            let guildDb = await Guild.findOne({ guildId: guild.id });
+            const alertChannel = await guild.channels.fetch(guildDb.alertChannelId)
+              .catch(console.error);
+            sendEmbedCaseAlert(alertChannel, _case);
+          }
         } catch (error) {
           console.log(`Unmute Error: ${error}`);
         }
