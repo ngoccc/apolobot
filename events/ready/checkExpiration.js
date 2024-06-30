@@ -21,7 +21,7 @@ async function checkAndUnmuteCases(guild) {
       const currentTime = new Date();
       const expirationTime = new Date(createdOn.getTime() + ms(duration));
 
-      if (_case.processStep !== "Case Closed - Succeeded to Apologize" && currentTime > expirationTime) {
+      if ((processStep !== "Case Closed - Succeeded to Apologize" && currentTime > expirationTime) && (processStep !== "Case Closed - Expired")) {
         // Unmute offender
         try {
           guild.channels.cache
