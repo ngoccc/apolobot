@@ -17,11 +17,16 @@ module.exports = async (client) => {
 async function checkAndUnmuteCases(guild) {
   let cases = await Case.find({ guildId: guild.id });
   cases.forEach(async (_case) => {
-      const { createdOn, duration, processStep } = _case;
+      const {
+        createdOn,
+        duration,
+        processStep,
+        approvalStatus,
+      } = _case;
       const currentTime = new Date();
       const expirationTime = new Date(createdOn.getTime() + ms(duration));
 
-      if ((processStep !== "Case Closed - Succeeded to Apologize" && currentTime > expirationTime) && (processStep !== "Case Closed - Expired")) {
+      if ((processStep !== "Case Closed - Succeeded to Apologize" && currentTime > expirationTime) && (processStep !== "Case Closed - Expired") && (approvalStatus !== "Aborted")) {
         // Unmute offender
         try {
           guild.channels.cache

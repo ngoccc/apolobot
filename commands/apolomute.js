@@ -244,7 +244,7 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
     // [testing] In the background, unmute the offender after the duration
     setTimeout(async () => {
       let newCase = await Case.findOne({ guildId: interaction.guild.id, localCaseId: _case.localCaseId });
-      if (newCase.processStep !== "Case Closed - Succeeded to Apologize") {
+      if ((newCase.processStep !== "Case Closed - Succeeded to Apologize") && (newCase.approvalStatus !== "Aborted")) {
         try {
           interaction.guild.channels.cache
             .filter(
