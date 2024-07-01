@@ -13,6 +13,9 @@ const caseSchema = new Schema({
     type: String,
     required: true,
   },
+  initialMessageId: {
+    type: String,
+  },
   duration: {
     type: String,
     required: true,

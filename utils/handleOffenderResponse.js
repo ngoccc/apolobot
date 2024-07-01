@@ -8,7 +8,7 @@ const Case = require('../models/Case');
 const Guild = require('../models/Guild');
 const disableButton = require('../components/disableButton');
 
-module.exports = (channel, _case, caseAlertEmbed) => {
+module.exports = (thread, _case, caseAlertEmbed) => {
   const approve = new ButtonBuilder()
                   .setCustomId(`mod-review-approve-${_case.id}`)
                   .setLabel('Approve')
@@ -20,7 +20,7 @@ module.exports = (channel, _case, caseAlertEmbed) => {
   const row = new ActionRowBuilder()
                   .addComponents(approve, decline);
 
-  channel.send({
+  thread.send({
     embeds: [caseAlertEmbed],
     components: [row],
   });

@@ -10,7 +10,7 @@ const handleOffenderResponse = require('./handleOffenderResponse');
 const notifyUsers = require('./notifyUsers');
 const disableButton = require('../components/disableButton');
 
-module.exports = (channel, _case) => {
+module.exports = async (channel, _case) => {
   const {
     proof,
     duration,
@@ -24,6 +24,8 @@ module.exports = (channel, _case) => {
     offenderResponse,
     approvalStatus,
     remarks,
+    initialMessageId,
+    guildId,
   } = _case;
 
   let caseAlertEmbed = new EmbedBuilder()
@@ -58,7 +60,9 @@ module.exports = (channel, _case) => {
 
   if (processStep === 'Offender Responded') {
     caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
-    const modApprove = handleOffenderResponse(channel, _case, caseAlertEmbed); // This func returns 1 if offender response was mod-approved, otherwise 0
+    const initialMessage = await channel.messages.fetch(initialMessageId);
+    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
+    const modApprove = handleOffenderResponse(thread, _case, caseAlertEmbed); // This func returns 1 if offender response was mod-approved, otherwise 0
     if (modApprove) {
       // TODO: send embed saying that mod approve?
     } else {
@@ -72,12 +76,28 @@ module.exports = (channel, _case) => {
     const row = new ActionRowBuilder()
                     .addComponents(unmute);
 
-    channel.send({
+    const initialMessage = await channel.messages.fetch(initialMessageId);
+    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
+    await thread.send({
       embeds: [caseAlertEmbed],
       components: [row],
     });
 
   } else {
-    channel.send({ embeds: [caseAlertEmbed] });
+    if (!initialMessageId) {
+      // create new message for thread
+      const initialMessage = await channel.send({
+        embeds: [caseAlertEmbed],
+      });
+      _case.initialMessageId = initialMessage.id;
+      await _case.save();
+    } else {
+      // send update in the thread
+      const initialMessage = await channel.messages.fetch(initialMessageId);
+      const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
+      await thread.send({
+        embeds: [caseAlertEmbed],
+      });
+    }
   };
 };
