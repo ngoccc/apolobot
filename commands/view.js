@@ -68,7 +68,7 @@ module.exports = {
       if (remarks) {
         caseAlertEmbed.addFields({ name: 'Remarks', value: `${remarks}` });
       }
-      return await interaction.channel.send({ embeds: [caseAlertEmbed] });
+      return await interaction.editReply({ embeds: [caseAlertEmbed] });
 
     } else {
 			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
