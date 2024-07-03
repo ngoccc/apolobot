@@ -21,6 +21,7 @@ module.exports = (thread, _case, caseAlertEmbed) => {
                   .addComponents(approve, decline);
 
   thread.send({
+    content: `<@${_case.modId}>`,
     embeds: [caseAlertEmbed],
     components: [row],
   });

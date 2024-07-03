@@ -76,17 +76,29 @@ module.exports = async (channel, _case) => {
     const row = new ActionRowBuilder()
                     .addComponents(unmute);
 
-    const initialMessage = await channel.messages.fetch(initialMessageId);
-    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
-    await thread.send({
-      embeds: [caseAlertEmbed],
-      components: [row],
-    });
+    if (!initialMessageId) {
+      // create new message for thread
+      const initialMessage = await channel.send({
+        content: `<@${modId}>`,
+        embeds: [caseAlertEmbed],
+      });
+      _case.initialMessageId = initialMessage.id;
+      await _case.save();
+    } else {
+      const initialMessage = await channel.messages.fetch(initialMessageId);
+      const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
+      await thread.send({
+        content: `<@${modId}>`,
+        embeds: [caseAlertEmbed],
+        components: [row],
+      });
+    }
 
   } else {
     if (!initialMessageId) {
       // create new message for thread
       const initialMessage = await channel.send({
+        content: `<@${modId}>`,
         embeds: [caseAlertEmbed],
       });
       _case.initialMessageId = initialMessage.id;
@@ -96,6 +108,7 @@ module.exports = async (channel, _case) => {
       const initialMessage = await channel.messages.fetch(initialMessageId);
       const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
       await thread.send({
+        content: `<@${modId}>`,
         embeds: [caseAlertEmbed],
       });
     }
