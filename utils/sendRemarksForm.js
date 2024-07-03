@@ -16,7 +16,7 @@ module.exports = async (interaction, extractedId) => {
     .setCustomId('remarks')
       // The label is the prompt the user sees for this input
     .setLabel("Please provide any remark on your decision.")
-    .setPlaceholder("Here you can express any thoughts on the given case. Enter 0 if you don't want to leave any remark.")
+    .setPlaceholder("Here you can express any thoughts regarding the given incident. Enter 0 if you don't want to leave any remark.")
       // Short means only a single line of text
     .setStyle(TextInputStyle.Paragraph)
   // .setMaxLength(1000)
