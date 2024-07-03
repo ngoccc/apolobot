@@ -73,25 +73,46 @@ module.exports = (_case, channels) => {
       let victimEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setDescription("This case was aborted by the moderator.\nYou may now close or leave this thread.");
-      channels[0].send({ embeds: [victimEmbed] });
+      // just in case they might have closed the thread
+      if (channels[0]) {
+        channels[0].send({ embeds: [victimEmbed] });
+      }
 
       // offender
       let offenderEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setDescription("This case was aborted by the moderator.\nYou may now close or leave this thread.");
+      if (channels[1]) {
+        channels[1].send({ embeds: [offenderEmbed] });
+      }
+    } else if (approvalStatus == 'Apology Request Declined') {
+      // victim
+      let victimEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setDescription("Your apology request was not approved by the moderator.\nYou may now close or leave this thread.");
+      channels[0].send({ embeds: [victimEmbed] });
+
+      // offender
+      let offenderEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setDescription("The case was not approved for review by the moderator. You will continue to be muted for the rest of the specified duration\nYou may now close or leave this thread.");
       channels[1].send({ embeds: [offenderEmbed] });
     }
   } else if (processStep === 'Case Closed - Expired') {
     let victimEmbed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setDescription("This case has expired.\nYou may now close or leave this thread.");
-    channels[0].send({ embeds: [victimEmbed] });
+    if (channels[0]) {
+      channels[0].send({ embeds: [victimEmbed] });
+    }
 
     // offender
     let offenderEmbed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setDescription("This case has expired.\nYou may now close or leave this thread.");
-    channels[1].send({ embeds: [offenderEmbed] });
+    if (channels[1]) {
+      channels[1].send({ embeds: [offenderEmbed] });
+    }
   } else return;
 }
 

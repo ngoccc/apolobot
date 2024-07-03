@@ -25,29 +25,33 @@ module.exports = async (interaction) => {
       const guild = await Guild.findOne({ guildId: interaction.guild.id });
       const alertChannel = await interaction.client.channels.fetch(guild.alertChannelId)
       sendEmbedCaseAlert(alertChannel, _case);
+      if (_case.reviewRequest) {
+        await interaction.reply({ content: 'Your apology request was received successfully! This will be reviewed by the moderator team and if approved, it will be delivered to the corresponding user.' });
+      } else {
+        await interaction.reply({ content: 'Your apology request was received successfully! This will be sent to the corresponding user and awaiting response.' });
 
-      await interaction.reply({ content: 'Your apology request was received successfully! This will be sent to the corresponding user and awaiting response.' });
-      // Send request to offender thread
-      const { offenderId,
-              victimId,
-              victimRequest,
-              offenderThreadId,
-            } = _case;
-      const offender = await interaction.guild.members.fetch(offenderId);
-      const victim = await interaction.guild.members.fetch(victimId);
-      const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
+        // Send request to offender thread
+        const { offenderId,
+                victimId,
+                victimRequest,
+                offenderThreadId,
+              } = _case;
+        const offender = await interaction.guild.members.fetch(offenderId);
+        const victim = await interaction.guild.members.fetch(victimId);
+        const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
 
-      sendApproveForm({
-        type: 'yn',
-        msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by giving an apology.\n\
-__**Here is the apology request from ${victim.displayName}**:__\n> ${victimRequest}.\n\
-If you proceed with an apology that is accepted by the user, your account mute will be instantly lifted. Otherwise, it will remain for the rest of the intended period.
-Would you want to proceed?`,
-        thread: offenderThread,
-        target: offender,
-        _case: _case,
-        customId: "apology-response",
-      });
+        sendApproveForm({
+          type: 'yn',
+          msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by giving an apology.\n\
+  __**Here is the apology request from ${victim.displayName}**:__\n> ${victimRequest}.\n\
+  If you proceed with an apology that is accepted by the user, your account mute will be instantly lifted. Otherwise, it will remain for the rest of the intended period.
+  Would you want to proceed?`,
+          thread: offenderThread,
+          target: offender,
+          _case: _case,
+          customId: "apology-response",
+        });
+      }
 
       // Disable the buttons
       await interaction.message.edit({
@@ -77,7 +81,11 @@ Would you want to proceed?`,
       const extractedId = extractId(interaction.customId);
       let _case = await Case.findOne({ _id: extractedId });
       _case.remarks = interaction.fields.getTextInputValue('remarks');
-      await interaction.reply({ content: 'Your response were received successfully. Your perspective are valuable to improve the community!' });
+      if (_case.approvalStatus !== "Apology Request Declined") {
+        await interaction.reply({ content: 'Your response were received successfully. Your perspective are valuable to improve the community!' });
+      } else {
+        await interaction.reply({ content: 'Remarks were recorded successfully!' });
+      }
 
       // remarks is always in the end so send embed update here
       const guild = await Guild.findOne({ guildId: interaction.guild.id });

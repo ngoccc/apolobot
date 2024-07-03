@@ -45,6 +45,11 @@ module.exports = {
               .setName('proof')
               .setDescription('Proof (e.g image, screenshot) for the given case.')
           )
+          .addBooleanOption(option =>
+            option
+              .setName('review-request')
+              .setDescription("Review the victim's request before sending to offender.")
+          )
           .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
           .setDMPermission(false),
 
@@ -57,6 +62,7 @@ module.exports = {
     const duration = interaction.options.getString('duration'); // 1d, 1 day, 1s 5s, 5m
     const reason = interaction.options.getString('reason');
     const proof = interaction.options.getAttachment('proof');
+    const reviewRequest = interaction.options.getBoolean('review-request') ? true : false;
     const { default: prettyMs } = await import('pretty-ms');
 
     await interaction.deferReply({ ephemeral: true });
@@ -137,6 +143,7 @@ module.exports = {
       offenderId: offender.id,
       victimId: victim.id,
       processStep: 'Waiting for Victim Request',
+      reviewRequest: reviewRequest,
     });
     await _case.save();
 
@@ -233,7 +240,7 @@ The request will expire in ${prettyMs(msDuration, { verbose: true })}.`,
       });
     } catch (error) {
       console.log(`Error: ${error}`);
-			return interaction.reply({ content: 'An error occurred while trying to create a private thread for victim' });
+			return interaction.editReply({ content: 'An error occurred while trying to create a private thread for victim' });
     }
 
     // Update case

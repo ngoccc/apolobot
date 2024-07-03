@@ -1,6 +1,9 @@
 const { Schema, model } = require('mongoose');
 
 const caseSchema = new Schema({
+  reviewRequest: {
+    type: Boolean,
+  },
   guildId: {
     type: String,
     required: true,

@@ -12,6 +12,7 @@ const notifyUsers = require('../../utils/notifyUsers');
 const disableButton = require('../../components/disableButton');
 const handleVictimFinalReview = require('../../utils/handleVictimFinalReview');
 const sendRemarksForm = require('../../utils/sendRemarksForm');
+const sendApproveForm = require('../../utils/sendApproveForm');
 
 function extractId(str) {
     // Split the string by hyphens
@@ -169,6 +170,51 @@ module.exports = async (interaction) => {
         await _case.save();
 
         sendRemarksForm(interaction, extractedId);
+      }
+    } else if (customId.includes('request-review')) {
+      const extractedId = extractId(customId);
+      let _case = await Case.findOne({ _id: extractedId });
+
+      if (customId.includes('approve')) {
+        _case.processStep = 'Apology Request Approved';
+        await _case.save();
+
+        // Disable the buttons
+        await interaction.message.edit({
+          components: [disableButton("Approved")],
+        });
+
+        // Send apology to offender
+        const { offenderId,
+                victimId,
+                victimRequest,
+                offenderThreadId,
+              } = _case;
+        const offender = await interaction.guild.members.fetch(offenderId);
+        const victim = await interaction.guild.members.fetch(victimId);
+        const offenderThread = await interaction.client.channels.fetch(offenderThreadId);
+
+        sendApproveForm({
+          type: 'yn',
+          msg: `${offender}, the moderator team has reviewed your case along with the involving user ${victim.displayName}. The user has agreed to give you a second chance to lift the mute by giving an apology.\n\
+  __**Here is the apology request from ${victim.displayName}**:__\n> ${victimRequest}.\n\
+  If you proceed with an apology that is accepted by the user, your account mute will be instantly lifted. Otherwise, it will remain for the rest of the intended period.
+  Would you want to proceed?`,
+          thread: offenderThread,
+          target: offender,
+          _case: _case,
+          customId: "apology-response",
+        });
+        await interaction.reply('Apology request sent to offender!.');
+        return 1;
+      } else if (customId.includes('decline')) {
+
+        _case.processStep = 'Case Closed - Failed to Apologize';
+        _case.approvalStatus = 'Apology Request Declined';
+        await _case.save();
+
+        sendRemarksForm(interaction, extractedId);
+        return 0;
       }
     }
   } else return;
