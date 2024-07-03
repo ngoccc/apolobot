@@ -135,7 +135,7 @@ module.exports = async (interaction) => {
         const extractedId = extractId(customId);
         const modal = new ModalBuilder()
           .setCustomId(`${type}-${extractedId}`)
-          .setTitle(`${type.split(/(?=[A-Z])/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`);
+          .setTitle(`${type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`);
 
         // Add components to modal
         // Create the text input components
