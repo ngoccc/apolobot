@@ -61,7 +61,7 @@ module.exports = async (channel, _case) => {
   if (processStep === 'Offender Responded') {
     caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
     const initialMessage = await channel.messages.fetch(initialMessageId);
-    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
+    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
     const modApprove = handleOffenderResponse(thread, _case, caseAlertEmbed); // This func returns 1 if offender response was mod-approved, otherwise 0
     if (modApprove) {
       // TODO: send embed saying that mod approve?
@@ -86,7 +86,7 @@ module.exports = async (channel, _case) => {
       await _case.save();
     } else {
       const initialMessage = await channel.messages.fetch(initialMessageId);
-      const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${caseData.id}` });
+      const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
       await thread.send({
         content: `<@${modId}>`,
         embeds: [caseAlertEmbed],
