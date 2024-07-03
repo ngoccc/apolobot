@@ -46,7 +46,7 @@ module.exports = {
       return interaction.reply({ content: `Cannot find case with id ${caseId}`, ephemeral: true });
     }
 
-    if (_case.processStep.includes('Case Closed')) {
+    if (_case.processStep.includes('Case Closed - Succeeded to Apologize')) {
       return interaction.reply({ content: `Case ${caseId} has already been closed`, ephemeral: true });
     }
 
