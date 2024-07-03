@@ -113,7 +113,7 @@ module.exports = async (interaction) => {
         handleVictimFinalReview(
           victimThread,
           _case,
-          `${victim}, we have received the response to your apology request from ${offender.displayName}:\n> ${offenderResponse}.\nDo you want to approve this apology?`
+          `${victim}, we have received the response to your apology request from ${offender.displayName}:\n> ${offenderResponse}.\nDo you want to accept this apology?`
         );
 
         await interaction.reply('Apology response sent to victim!.', { ephemeral: true });

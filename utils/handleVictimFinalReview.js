@@ -10,16 +10,16 @@ const sendRemarksForm = require('./sendRemarksForm');
 const disableButton = require('../components/disableButton');
 
 module.exports = async (victimThread, _case, msg) => {
-  const approve = new ButtonBuilder()
+  const accept = new ButtonBuilder()
                   .setCustomId(`victim-review-approve-${_case.id}`)
-                  .setLabel('Approve')
+                  .setLabel('Accept')
                   .setStyle(ButtonStyle.Success);
   const decline = new ButtonBuilder()
                   .setCustomId(`victim-review-decline-${_case.id}`)
                   .setLabel('Decline')
                   .setStyle(ButtonStyle.Danger);
   const row = new ActionRowBuilder()
-                  .addComponents(approve, decline);
+                  .addComponents(accept, decline);
 
   await victimThread.send({
     content: `${msg}`,
