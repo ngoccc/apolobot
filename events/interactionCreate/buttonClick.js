@@ -142,7 +142,7 @@ module.exports = async (interaction) => {
         const input = new TextInputBuilder()
           .setCustomId(`${type}`)
             // The label is the prompt the user sees for this input
-          .setLabel("Enter your response here.")
+          .setLabel(`Enter your ${type.slice(8)} here.`)
             // Short means only a single line of text
           .setStyle(TextInputStyle.Paragraph)
         // .setMaxLength(1000)
