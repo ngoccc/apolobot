@@ -18,10 +18,6 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
     .setDMPermission(false),
   run: async ({ interaction }) => {
-    // Check conditions
-    if (!interaction.member.permissions.has('ADMINISTRATOR'))
-      return interaction.reply({ content: 'You do not have the required permissions to use this command.', ephemeral: true });
-
     if (!interaction.inGuild()) {
       return interaction.reply({
         content: 'You can only run this command inside a server.',
