@@ -57,8 +57,6 @@ module.exports = async (channel, _case) => {
 
   if (processStep === 'Victim Requested') {
     caseAlertEmbed.addFields({ name: 'Victim Request', value: `${victimRequest}` });
-    const initialMessage = await channel.messages.fetch(initialMessageId);
-    const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
     if (reviewRequest) {
       // mod review victim request first
       const approve = new ButtonBuilder()
@@ -71,17 +69,42 @@ module.exports = async (channel, _case) => {
                       .setStyle(ButtonStyle.Danger);
       const row = new ActionRowBuilder()
                       .addComponents(approve, decline);
-      await thread.send({
-        content: `<@${modId}>`,
-        embeds: [caseAlertEmbed],
-        components: [row],
-      });
+      if (!initialMessageId) {
+        // create new message for thread
+        const initialMessage = await channel.send({
+          content: `<@${modId}>`,
+          embeds: [caseAlertEmbed],
+          components: [row],
+        });
+        _case.initialMessageId = initialMessage.id;
+        await _case.save();
+      } else {
+        const initialMessage = await channel.messages.fetch(initialMessageId);
+        const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
+        await thread.send({
+          content: `<@${modId}>`,
+          embeds: [caseAlertEmbed],
+          components: [row],
+        });
+      }
     } else {
       // simply send to mod w/o approve option
-      await thread.send({
-        content: `<@${modId}>`,
-        embeds: [caseAlertEmbed],
-      });
+      if (!initialMessageId) {
+        // create new message for thread
+        const initialMessage = await channel.send({
+          content: `<@${modId}>`,
+          embeds: [caseAlertEmbed],
+        });
+        _case.initialMessageId = initialMessage.id;
+        await _case.save();
+      } else {
+        const initialMessage = await channel.messages.fetch(initialMessageId);
+        const thread = initialMessage.hasThread ? initialMessage.thread : await initialMessage.startThread({ name: `update-case-${localCaseId}` });
+        await thread.send({
+          content: `<@${modId}>`,
+          embeds: [caseAlertEmbed],
+        });
+      }
     }
   } else if (processStep === 'Offender Responded') {
     caseAlertEmbed.addFields({ name: 'Offender Response', value: `${offenderResponse}` });
