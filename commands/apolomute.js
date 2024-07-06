@@ -145,7 +145,6 @@ module.exports = {
       processStep: 'Waiting for Victim Request',
       reviewRequest: reviewRequest,
     });
-    await _case.save();
 
     guild.totalCase += 1;
     await guild.save();
@@ -210,7 +209,6 @@ This decision will be further reviewed by the moderation team and involving comm
     }
 
     _case.offenderThreadId = offenderThread.id;
-    await _case.save();
 
     await interaction.editReply({ content: `${offender} has been muted from the server\nReason: ${reason}` });
 
