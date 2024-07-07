@@ -25,6 +25,7 @@ module.exports = async (interaction) => {
   if (interaction.isButton()) {
     const customId = interaction.customId;
     if (customId.includes('unmute')) {
+      await interaction.deferReply({ ephemeral: true });
       const extractedId = extractId(customId);
       let _case = await Case.findOne({ _id: extractedId });
       const offender = await interaction.guild.members.fetch(_case.offenderId);
@@ -57,12 +58,12 @@ module.exports = async (interaction) => {
         });
       } catch (error) {
         console.log(`Error: ${error}`);
-        return interaction.reply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
+        return interaction.editReply({ content: 'An error occurred while trying to unmute offender', ephemeral: true });
       }
       _case.approvalStatus = "All Approved";
       _case.processStep = "Case Closed - Succeeded to Apologize";
       await _case.save();
-      await interaction.reply({ content: 'Successfully unmuted offender!' });
+      await interaction.editReply({ content: 'Successfully unmuted offender!' });
       // notify victim and offender
       const victimThread = await interaction.client.channels.fetch(_case.victimThreadId);
       const offenderThread = await interaction.client.channels.fetch(_case.offenderThreadId);
@@ -88,6 +89,7 @@ module.exports = async (interaction) => {
       }
     }
     else if (customId.includes('mod-review')) {
+      await interaction.deferReply({ ephemeral: true });
       const extractedId = extractId(customId);
       let _case = await Case.findOne({ _id: extractedId });
 
@@ -117,7 +119,7 @@ module.exports = async (interaction) => {
           `${victim}, we have received the response to your apology request from ${offender.displayName}:\n> ${offenderResponse}.\nDo you want to accept this apology?`
         );
 
-        await interaction.reply('Apology response sent to victim!.', { ephemeral: true });
+        await interaction.editReply('Apology response sent to victim!.');
 
         return 1;
       } else if (customId.includes('decline')) {
@@ -176,6 +178,7 @@ module.exports = async (interaction) => {
       let _case = await Case.findOne({ _id: extractedId });
 
       if (customId.includes('approve')) {
+        await interaction.deferReply({ ephemeral: true });
         _case.processStep = 'Apology Request Approved';
         await _case.save();
 
@@ -205,7 +208,7 @@ module.exports = async (interaction) => {
           _case: _case,
           customId: "apology-response",
         });
-        await interaction.reply('Apology request sent to offender!.');
+        await interaction.editReply('Apology request sent to offender!.');
         return 1;
       } else if (customId.includes('decline')) {
 
