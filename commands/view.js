@@ -71,7 +71,7 @@ module.exports = {
       return await interaction.editReply({ embeds: [caseAlertEmbed] });
 
     } else {
-			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
+			return interaction.editReply({ content: 'An error occurred while trying to view the case', ephemeral: true });
     }
   },
 };
