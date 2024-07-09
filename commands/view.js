@@ -17,15 +17,21 @@ module.exports = {
               .setDescription('The id of the case.')
               .setRequired(true)
           )
+          .addBooleanOption(option =>
+            option
+              .setName('ephemeral')
+              .setDescription("Whether the message should be ephemeral (default: true).")
+          )
           .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
           .setDMPermission(false),
 
   run: async ({ interaction }) => {
     // retrieve the case with the given id
 		const searchId = interaction.options.getNumber('id');
+		const ephemeral = interaction.options.getBoolean('ephemeral') ? ephemeral : true;
     const _case = await Case.findOne({ guildId: interaction.guild.id, localCaseId: searchId });
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: ephemeral });
 
     if (_case) {
       const {
@@ -71,7 +77,7 @@ module.exports = {
       return await interaction.editReply({ embeds: [caseAlertEmbed] });
 
     } else {
-			return interaction.editReply({ content: 'An error occurred while trying to view the case', ephemeral: true });
+			return interaction.editReply({ content: 'An error occurred while trying to view the case', ephemeral: ephemeral });
     }
   },
 };
