@@ -28,7 +28,8 @@ module.exports = {
   run: async ({ interaction }) => {
     // retrieve the case with the given id
 		const searchId = interaction.options.getNumber('id');
-		const ephemeral = interaction.options.getBoolean('ephemeral') ? ephemeral : true;
+		let ephemeral = interaction.options.getBoolean('ephemeral');
+    if (ephemeral === null) { ephemeral = true; }
     const _case = await Case.findOne({ guildId: interaction.guild.id, localCaseId: searchId });
 
     await interaction.deferReply({ ephemeral: ephemeral });
