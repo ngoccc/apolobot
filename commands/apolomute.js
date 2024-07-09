@@ -62,7 +62,8 @@ module.exports = {
     const duration = interaction.options.getString('duration'); // 1d, 1 day, 1s 5s, 5m
     const reason = interaction.options.getString('reason');
     const proof = interaction.options.getAttachment('proof');
-    const reviewRequest = interaction.options.getBoolean('review-request') ? true : false;
+    let reviewRequest = interaction.options.getBoolean('review-request');
+    if (reviewRequest === null) { reviewRequest = false; }
     const { default: prettyMs } = await import('pretty-ms');
 
     await interaction.deferReply({ ephemeral: true });
