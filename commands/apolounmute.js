@@ -64,11 +64,7 @@ module.exports = {
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
             if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
-              await channel.permissionOverwrites.edit(_case.offenderId,
-                { 'SendMessages': true,
-                  'SendMessagesInThreads': true,
-                  'SendVoiceMessages': true,
-                });
+              await channel.permissionOverwrites.resolve(_case.offenderId)?.delete();
             }
           }
         });

@@ -43,11 +43,7 @@ async function checkAndUnmuteCases(guild) {
               if (channel.type === 0 || channel.type === 2) {
                 // duration timed out:
                 if (channel.permissionsFor(guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
-                  await channel.permissionOverwrites.edit(_case.offenderId,
-                    { 'SendMessages': true,
-                      'SendMessagesInThreads': true,
-                      'SendVoiceMessages': true,
-                    });
+                  await channel.permissionOverwrites.resolve(_case.offenderId)?.delete();
                 }
               }
             });
