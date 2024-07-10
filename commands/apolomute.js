@@ -176,6 +176,8 @@ module.exports = {
                 { 'SendMessages': false,
                   'SendMessagesInThreads': false,
                   'SendVoiceMessages': false,
+                  'CreatePublicThreads': false,
+                  'CreatePrivateThreads': false,
                 });
             }
           }
