@@ -158,7 +158,6 @@ module.exports = {
     sendEmbedCaseAlert(alertChannel, _case);
 
     // Mute the offender in all channels (assuming you have the necessary permissions)
-    try {
       interaction.guild.channels.cache
         .filter(
           (channel) =>
@@ -172,22 +171,27 @@ module.exports = {
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
             if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
-              await channel.permissionOverwrites.create(offender.id,
-                { 'SendMessages': false,
-                  'SendMessagesInThreads': false,
-                  'SendVoiceMessages': false,
-                  'CreatePublicThreads': false,
-                  'CreatePrivateThreads': false,
-                });
+              try {
+                await channel.permissionOverwrites.create(offender.id,
+                  { 'SendMessages': false,
+                    'SendMessagesInThreads': false,
+                    'SendVoiceMessages': false,
+                    'CreatePublicThreads': false,
+                    'CreatePrivateThreads': false,
+                  });
+              } catch (error) {
+                console.log(`Mute Error: ${error}`);
+                console.log(`offender's role: ${offender.roles.cache}`);
+                console.log(`channel: ${channel.name}`);
+                console.log(`bot's permission in channel: ${interaction.guild.members.me.permissionsIn(channel).toArray()}`);
+                console.log(`offender's permission in channel: ${offender.permissionsIn(channel).toArray()}`);
+                return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
+              }
             }
           }
         });
 
       // Also mute the given thread
-    } catch (error) {
-      console.log(`Mute Error: ${error}`);
-			return interaction.editReply({ content: 'An error occurred while trying to mute offender', ephemeral: true });
-    }
 
     // Create a private thread for the offender and the bot
     let offenderThread;
