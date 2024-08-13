@@ -170,7 +170,7 @@ module.exports = {
         )
         .forEach(async (channel) => {
           if (channel.type === 0 || channel.type === 2) {
-            if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel)) {
+            if (channel.permissionsFor(interaction.guild.members.me).has(PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageRoles)) {
               try {
                 await channel.permissionOverwrites.create(offender.id,
                   { 'SendMessages': false,
