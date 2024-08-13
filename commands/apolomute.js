@@ -181,7 +181,8 @@ module.exports = {
                   });
               } catch (error) {
                 console.log(`Mute Error: ${error}`);
-                console.log(`offender's role: ${offender.roles.map(r => `${r}`).join(' | '), true)}`);
+                console.log('offender roles:');
+                console.log(offender.roles.map(r => `${r}`).join(' | '), true);
                 console.log(`channel: ${channel.name}`);
                 console.log(`bot's permission in channel: ${interaction.guild.members.me.permissionsIn(channel).toArray()}`);
                 console.log(`offender's permission in channel: ${offender.permissionsIn(channel).toArray()}`);
