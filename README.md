@@ -1,5 +1,5 @@
-<h1>Apolobot - Addressing Online Interpersonal Harm through Apology Facilitation</h1>
+<h1>Source code for ApoloBot</h1>
 
-[Currently Work In Progress]
+ApoloBot was used as part of the work "The Design Space for Online Restorative Justice Tools: A Case Study with ApoloBot" (to appear in CHI 2025).
 
 To execute the bot, run the command: ```nodemon index.js```
