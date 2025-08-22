@@ -2,7 +2,7 @@
 
 To execute the bot locally, run the command: ```nodemon index.js```
 
-To deploy the bot, you need to set up a database and a deployment platform (e.g Heroku)
+To deploy the bot, you need to set up a database (e.g MongoDB) and a deployment platform (e.g Heroku)
 
 ## Resources
 Paper (CHI'25): [link](https://dl.acm.org/doi/10.1145/3706598.3713598)
